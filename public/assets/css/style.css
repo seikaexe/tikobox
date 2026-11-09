@@ -147,3 +147,13 @@ footer{border-top:4px solid var(--black);padding:22px var(--pad);display:flex;ju
 /* Semua teks bold: judul, tombol, dan label paling tebal */
 h1,h2,h3,.brand,.btn,.badge,.nav-links a,.steps b,.steps span,.formats span,.progress-top,footer,mark{font-weight:900}
 input,button,::placeholder{font-weight:800}
+
+/* Gate iklan sebelum download video */
+body.ad-open{overflow:hidden}
+.ad-gate{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px}
+.ad-box{width:100%;max-width:420px;max-height:92vh;overflow:auto;background:#fff;border:4px solid var(--black);box-shadow:8px 8px 0 var(--black);padding:12px;display:flex;flex-direction:column;gap:12px}
+.ad-head{display:flex;justify-content:space-between;align-items:center;font-weight:900}
+.ad-close{width:36px;height:36px;border:3px solid var(--black);background:#fff;font-weight:900;cursor:pointer}
+.ad-slot{min-height:250px;background:#f2f2f2;border:2px dashed var(--black);overflow:hidden}
+.ad-go{width:100%;height:52px}
+.ad-go:disabled{opacity:.6;cursor:not-allowed}

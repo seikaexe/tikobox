@@ -274,6 +274,43 @@ form.addEventListener("submit", async (event) => {
   }
 });
 
+// ===== Iklan sebelum download video =====
+const AD_CLIENT = "ca-pub-2508505478063065";
+const AD_SLOT = ""; // ISI dengan ID slot unit iklan AdSense (angka). Kosong = gate iklan nonaktif
+const AD_WAIT = 5;  // detik sebelum tombol lanjut aktif
+
+function showAdGate() {
+  return new Promise((resolve) => {
+    const wrap = document.createElement("div");
+    wrap.className = "ad-gate";
+    wrap.innerHTML = `
+      <div class="ad-box" role="dialog" aria-modal="true" aria-label="Iklan">
+        <div class="ad-head"><b>IKLAN</b><button type="button" class="ad-close" aria-label="Tutup">X</button></div>
+        <div class="ad-slot"><ins class="adsbygoogle" style="display:block;min-height:250px" data-ad-client="${AD_CLIENT}" data-ad-slot="${AD_SLOT}" data-ad-format="auto" data-full-width-responsive="true"></ins></div>
+        <button type="button" class="btn btn-pink ad-go" disabled>LANJUT DOWNLOAD (${AD_WAIT})</button>
+      </div>`;
+    document.body.appendChild(wrap);
+    document.body.classList.add("ad-open");
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+
+    const go = wrap.querySelector(".ad-go");
+    let left = AD_WAIT;
+    const done = (ok) => {
+      clearInterval(timer);
+      wrap.remove();
+      document.body.classList.remove("ad-open");
+      resolve(ok);
+    };
+    const timer = setInterval(() => {
+      left--;
+      if (left > 0) go.textContent = `LANJUT DOWNLOAD (${left})`;
+      else { clearInterval(timer); go.disabled = false; go.textContent = "LANJUT DOWNLOAD"; }
+    }, 1000);
+    go.addEventListener("click", () => done(true));
+    wrap.querySelector(".ad-close").addEventListener("click", () => done(false));
+  });
+}
+
 resultBox.addEventListener("click", async (event) => {
   const btn = event.target.closest("button[data-act]");
   if (!btn) return;
@@ -282,6 +319,13 @@ resultBox.addEventListener("click", async (event) => {
   if (act === "prev" || act === "next") return showSlide(slideIndex + (act === "next" ? 1 : -1));
 
   const size = Number(btn.dataset.size) || 0;
+
+  // Hanya tombol download video yang wajib lewat iklan (foto & MP3 tidak)
+  if (act === "video" && AD_SLOT) {
+    const ok = await showAdGate();
+    if (!ok) return;
+  }
+
   btn.disabled = true;
   statusBox.hidden = true;
 
