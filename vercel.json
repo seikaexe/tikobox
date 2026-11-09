@@ -1,12 +1,16 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "api/index.ts", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "^/api/(.*)$", "dest": "/api/index.ts" },
-    { "src": "^/docs/?$", "dest": "/docs.html" },
-    { "src": "^/$", "dest": "/index.html" },
-    { "src": "^/(.*)$", "dest": "/$1" }
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.ts"
+    },
+    {
+      "source": "/",
+      "destination": "/public/index.html"
+    },
+    {
+      "source": "/docs",
+      "destination": "/public/docs.html"
+    }
   ]
 }
