@@ -37,19 +37,42 @@ const HEADERS: Record<string, string> = {
   accept:
     "text/html,application/xhtml+xml,application/xml;q=0.9," +
     "image/avif,image/webp,*/*;q=0.8",
-  "accept-language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
+  "accept-language":
+    "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
   "cache-control": "no-cache",
   pragma: "no-cache"
 };
 
+const TIKTOK_HOSTS = [
+  "tiktok.com",
+  "www.tiktok.com",
+  "m.tiktok.com",
+  "vm.tiktok.com",
+  "vt.tiktok.com"
+];
+
+const SHORTLINK_HOSTS = [
+  "tt.site",
+  "www.tt.site"
+];
+
 export async function downloadTikTok(
   url: string
 ): Promise<TikTokResult> {
-  const finalUrl = await resolveTikTokUrl(url);
+  const finalUrl =
+    await resolveTikTokUrl(url);
 
-  const html = await fetchHtml(finalUrl);
+  if (!isTikTokHost(finalUrl)) {
+    throw new Error(
+      "Link tidak mengarah ke halaman TikTok"
+    );
+  }
 
-  const data = extractTikTokData(html);
+  const html =
+    await fetchHtml(finalUrl);
+
+  const data =
+    extractTikTokData(html);
 
   if (!data) {
     throw new Error(
@@ -57,9 +80,18 @@ export async function downloadTikTok(
     );
   }
 
-  const result = normalizeTikTokData(data, html);
+  const result =
+    normalizeTikTokData(
+      data,
+      html
+    );
 
-  if (!result.id && !result.video?.hd && !result.video?.sd) {
+  if (
+    !result.id &&
+    !result.video?.hd &&
+    !result.video?.sd &&
+    !result.images?.length
+  ) {
     throw new Error(
       "URL video tidak ditemukan. TikTok mungkin memblokir halaman atau mengubah struktur HTML"
     );
@@ -71,53 +103,128 @@ export async function downloadTikTok(
 /*
  * Resolve:
  *
- * vt.tiktok.com
- * vm.tiktok.com
- * www.tt.site
- * www.tt.site/t/...
+ * https://vt.tiktok.com/...
+ * https://vm.tiktok.com/...
+ * https://tt.site/...
+ * https://www.tt.site/...
+ * https://www.tt.site/t/...
  *
  * menjadi URL TikTok final
  */
 async function resolveTikTokUrl(
   input: string
 ): Promise<string> {
-  let current = input.trim();
+  let current =
+    input.trim();
 
-  for (let i = 0; i < 5; i++) {
-    const controller = new AbortController();
+  for (let i = 0; i < 10; i++) {
+    const controller =
+      new AbortController();
 
-    const timer = setTimeout(
-      () => controller.abort(),
-      TIMEOUT
-    );
+    const timer =
+      setTimeout(
+        () => controller.abort(),
+        TIMEOUT
+      );
 
     try {
-      const response = await fetch(current, {
-        method: "GET",
-        headers: {
-          ...HEADERS,
-          accept: "text/html,*/*;q=0.8"
-        },
-        redirect: "manual",
-        signal: controller.signal
-      });
+      console.log(
+        `[Tikobox] Resolve ${i + 1}:`,
+        current
+      );
+
+      const response =
+        await fetch(current, {
+          method: "GET",
+
+          headers: {
+            ...HEADERS,
+            accept:
+              "text/html,application/xhtml+xml," +
+              "application/xml;q=0.9,*/*;q=0.8"
+          },
+
+          redirect: "manual",
+
+          signal:
+            controller.signal
+        });
 
       const location =
-        response.headers.get("location");
+        response.headers.get(
+          "location"
+        );
 
-      if (!location) {
+      console.log(
+        `[Tikobox] HTTP ${response.status}`,
+        location
+          ? `→ ${location}`
+          : ""
+      );
+
+      /*
+       * Redirect HTTP biasa
+       */
+      if (location) {
+        current =
+          new URL(
+            location,
+            current
+          ).href;
+
+        continue;
+      }
+
+      /*
+       * Kalau sudah TikTok,
+       * jangan diproses sebagai shortlink lagi
+       */
+      if (
+        isTikTokHost(
+          current
+        )
+      ) {
         return current;
       }
 
-      current = new URL(
-        location,
-        current
-      ).href;
+      /*
+       * Shortlink kadang tidak menggunakan
+       * HTTP Location dan mengirim HTML
+       * berisi redirect JavaScript / meta refresh
+       */
+      const body =
+        await response.text();
+
+      const redirectedUrl =
+        extractRedirectUrl(
+          body,
+          current
+        );
+
+      if (
+        redirectedUrl
+      ) {
+        console.log(
+          "[Tikobox] HTML redirect →",
+          redirectedUrl
+        );
+
+        current =
+          redirectedUrl;
+
+        continue;
+      }
+
+      /*
+       * Tidak menemukan redirect
+       */
+      return current;
 
     } catch (error) {
       if (
         error instanceof Error &&
-        error.name === "AbortError"
+        error.name ===
+          "AbortError"
       ) {
         throw new Error(
           "TikTok terlalu lama merespons saat resolve URL"
@@ -125,35 +232,239 @@ async function resolveTikTokUrl(
       }
 
       throw error;
+
     } finally {
-      clearTimeout(timer);
+      clearTimeout(
+        timer
+      );
     }
   }
 
-  return current;
+  throw new Error(
+    "Terlalu banyak redirect saat membuka link TikTok"
+  );
 }
 
 /*
- * Ambil HTML halaman TikTok secara langsung
+ * Cek hostname TikTok
+ */
+function isTikTokHost(
+  url: string
+): boolean {
+  try {
+    const host =
+      new URL(url)
+        .hostname
+        .toLowerCase();
+
+    return (
+      TIKTOK_HOSTS.includes(
+        host
+      ) ||
+      host.endsWith(
+        ".tiktok.com"
+      )
+    );
+  } catch {
+    return false;
+  }
+}
+
+/*
+ * Cek hostname shortlink
+ */
+function isShortlinkHost(
+  url: string
+): boolean {
+  try {
+    const host =
+      new URL(url)
+        .hostname
+        .toLowerCase();
+
+    return (
+      SHORTLINK_HOSTS.includes(
+        host
+      ) ||
+      host.endsWith(
+        ".tt.site"
+      )
+    );
+  } catch {
+    return false;
+  }
+}
+
+/*
+ * Ambil URL redirect dari HTML.
+ *
+ * Support:
+ *
+ * <meta http-equiv="refresh"
+ * content="0;url=https://www.tiktok.com/...">
+ *
+ * window.location.href = "..."
+ *
+ * location.href = "..."
+ *
+ * location.replace("...")
+ *
+ * location.assign("...")
+ */
+function extractRedirectUrl(
+  html: string,
+  baseUrl: string
+): string | undefined {
+  const patterns = [
+    /*
+     * Meta refresh
+     */
+    /<meta[^>]+http-equiv=["']refresh["'][^>]+content=["'][^"']*url\s*=\s*([^"' >]+)[^"']*["']/i,
+
+    /*
+     * window.location.href
+     */
+    /(?:window\.)?location(?:\.href)?\s*=\s*["']([^"']+)["']/i,
+
+    /*
+     * location.replace()
+     */
+    /location\.replace\s*\(\s*["']([^"']+)["']\s*\)/i,
+
+    /*
+     * location.assign()
+     */
+    /location\.assign\s*\(\s*["']([^"']+)["']\s*\)/i,
+
+    /*
+     * URL encoded redirect parameter
+     */
+    /(?:url|redirect|target|dest|destination)=([^&"' <]+)/i
+  ];
+
+  for (
+    const pattern of patterns
+  ) {
+    const match =
+      html.match(
+        pattern
+      );
+
+    if (
+      !match?.[1]
+    ) {
+      continue;
+    }
+
+    try {
+      let value =
+        htmlDecode(
+          match[1]
+        );
+
+      value =
+        decodeURIComponentSafe(
+          value
+        );
+
+      return new URL(
+        value,
+        baseUrl
+      ).href;
+
+    } catch {
+      continue;
+    }
+  }
+
+  /*
+   * Fallback:
+   * cari URL TikTok langsung
+   * di dalam HTML
+   */
+  const tiktokMatch =
+    html.match(
+      /https?:\/\/(?:www\.|m\.)?tiktok\.com\/[^\s"'<>\\]+/i
+    );
+
+  if (
+    tiktokMatch?.[0]
+  ) {
+    try {
+      return new URL(
+        htmlDecode(
+          tiktokMatch[0]
+        ),
+        baseUrl
+      ).href;
+
+    } catch {
+      return undefined;
+    }
+  }
+
+  /*
+   * Fallback untuk URL pendek
+   * vm.tiktok.com / vt.tiktok.com
+   */
+  const shortMatch =
+    html.match(
+      /https?:\/\/(?:vm|vt)\.tiktok\.com\/[^\s"'<>\\]+/i
+    );
+
+  if (
+    shortMatch?.[0]
+  ) {
+    try {
+      return new URL(
+        htmlDecode(
+          shortMatch[0]
+        ),
+        baseUrl
+      ).href;
+
+    } catch {
+      return undefined;
+    }
+  }
+
+  return undefined;
+}
+
+/*
+ * Ambil HTML halaman TikTok
  */
 async function fetchHtml(
   url: string
 ): Promise<string> {
-  const controller = new AbortController();
+  const controller =
+    new AbortController();
 
-  const timer = setTimeout(
-    () => controller.abort(),
-    TIMEOUT
-  );
+  const timer =
+    setTimeout(
+      () => controller.abort(),
+      TIMEOUT
+    );
 
   try {
-    const response = await fetch(url, {
-      headers: HEADERS,
-      redirect: "follow",
-      signal: controller.signal
-    });
+    const response =
+      await fetch(
+        url,
+        {
+          headers:
+            HEADERS,
 
-    if (!response.ok) {
+          redirect:
+            "follow",
+
+          signal:
+            controller.signal
+        }
+      );
+
+    if (
+      !response.ok
+    ) {
       throw new Error(
         `TikTok returned HTTP ${response.status}`
       );
@@ -164,7 +475,8 @@ async function fetchHtml(
   } catch (error) {
     if (
       error instanceof Error &&
-      error.name === "AbortError"
+      error.name ===
+        "AbortError"
     ) {
       throw new Error(
         "TikTok terlalu lama merespons. Coba lagi"
@@ -172,17 +484,20 @@ async function fetchHtml(
     }
 
     throw error;
+
   } finally {
-    clearTimeout(timer);
+    clearTimeout(
+      timer
+    );
   }
 }
 
 /*
- * Strategi:
+ * Strategi ekstraksi:
  *
  * 1. __UNIVERSAL_DATA_FOR_REHYDRATION__
  * 2. SIGI_STATE
- * 3. Regex fallback
+ * 3. regex fallback
  */
 function extractTikTokData(
   html: string
@@ -193,11 +508,17 @@ function extractTikTokData(
       "__UNIVERSAL_DATA_FOR_REHYDRATION__"
     );
 
-  if (universal) {
+  if (
+    universal
+  ) {
     const item =
-      findVideoObject(universal);
+      findVideoObject(
+        universal
+      );
 
-    if (item) {
+    if (
+      item
+    ) {
       return item;
     }
   }
@@ -208,23 +529,31 @@ function extractTikTokData(
       "SIGI_STATE"
     );
 
-  if (sigi) {
+  if (
+    sigi
+  ) {
     const item =
-      findVideoObject(sigi);
+      findVideoObject(
+        sigi
+      );
 
-    if (item) {
+    if (
+      item
+    ) {
       return item;
     }
   }
 
-  return extractFromHtml(html);
+  return extractFromHtml(
+    html
+  );
 }
 
 /*
  * Ambil JSON dari:
  *
  * <script id="..." type="application/json">
- *   {...}
+ * {...}
  * </script>
  */
 function extractScriptJson(
@@ -234,15 +563,19 @@ function extractScriptJson(
   const pattern =
     new RegExp(
       `<script[^>]*id=["']${escapeRegExp(id)}["'][^>]*>` +
-      `([\\s\\S]*?)` +
-      `</script>`,
+        `([\\s\\S]*?)` +
+        `</script>`,
       "i"
     );
 
   const match =
-    html.match(pattern);
+    html.match(
+      pattern
+    );
 
-  if (!match?.[1]) {
+  if (
+    !match?.[1]
+  ) {
     return null;
   }
 
@@ -252,13 +585,15 @@ function extractScriptJson(
         match[1].trim()
       )
     );
+
   } catch {
     return null;
   }
 }
 
 /*
- * Cari object video secara recursive
+ * Cari object video
+ * secara recursive
  */
 function findVideoObject(
   root: any
@@ -271,47 +606,84 @@ function findVideoObject(
   ): any | null {
     if (
       value === null ||
-      typeof value !== "object"
+      typeof value !==
+        "object"
     ) {
       return null;
     }
 
-    if (visited.has(value)) {
+    if (
+      visited.has(
+        value
+      )
+    ) {
       return null;
     }
 
-    visited.add(value);
+    visited.add(
+      value
+    );
 
     /*
-     * Struktur video TikTok biasanya
-     * mempunyai playAddr / downloadAddr
+     * Struktur video TikTok
+     * biasanya memiliki:
+     *
+     * playAddr
+     * downloadAddr
+     * video
      */
     if (
-      typeof value.id === "string" &&
       (
-        typeof value.video === "object" ||
-        typeof value.playAddr === "object" ||
-        typeof value.downloadAddr === "object"
+        typeof value.id ===
+          "string" ||
+        typeof value.itemId ===
+          "string"
+      ) &&
+      (
+        typeof value.video ===
+          "object" ||
+        typeof value.playAddr ===
+          "object" ||
+        typeof value.playAddr ===
+          "string" ||
+        typeof value.downloadAddr ===
+          "object" ||
+        typeof value.downloadAddr ===
+          "string"
       )
     ) {
       return value;
     }
 
+    /*
+     * Beberapa struktur memakai
+     * itemId + video
+     */
     if (
-      typeof value.itemId === "string" &&
-      typeof value.video === "object"
+      typeof value.itemId ===
+        "string" &&
+      typeof value.video ===
+        "object"
     ) {
       return value;
     }
 
     if (
-      Array.isArray(value)
+      Array.isArray(
+        value
+      )
     ) {
-      for (const item of value) {
+      for (
+        const item of value
+      ) {
         const found =
-          walk(item);
+          walk(
+            item
+          );
 
-        if (found) {
+        if (
+          found
+        ) {
           return found;
         }
       }
@@ -320,12 +692,19 @@ function findVideoObject(
     }
 
     for (
-      const key of Object.keys(value)
+      const key of
+        Object.keys(
+          value
+        )
     ) {
       const found =
-        walk(value[key]);
+        walk(
+          value[key]
+        );
 
-      if (found) {
+      if (
+        found
+      ) {
         return found;
       }
     }
@@ -333,12 +712,14 @@ function findVideoObject(
     return null;
   }
 
-  return walk(root);
+  return walk(
+    root
+  );
 }
 
 /*
- * Fallback apabila JSON SSR
- * tidak tersedia
+ * Fallback apabila
+ * JSON SSR tidak tersedia
  */
 function extractFromHtml(
   html: string
@@ -395,7 +776,9 @@ function extractFromHtml(
 
   return {
     id,
-    desc: title,
+
+    desc:
+      title,
 
     video: {
       playAddr,
@@ -414,13 +797,15 @@ function normalizeTikTokData(
   html: string
 ): TikTokResult {
   const video =
-    d.video ?? {};
+    d.video ??
+    {};
 
   const playAddr =
     firstUrl([
       video.playAddr,
       video.play_addr,
       video.playAddrH264,
+      video.playAddrBytevc1,
       d.playAddr,
       d.play_addr
     ]);
@@ -429,6 +814,7 @@ function normalizeTikTokData(
     firstUrl([
       video.downloadAddr,
       video.download_addr,
+      video.downloadAddrH264,
       d.downloadAddr,
       d.download_addr
     ]);
@@ -438,6 +824,7 @@ function normalizeTikTokData(
       video.cover,
       video.originCover,
       video.origin_cover,
+      video.coverUrl,
       d.cover,
       d.originCover,
       d.origin_cover
@@ -459,12 +846,14 @@ function normalizeTikTokData(
     d.authorMeta?.nickName;
 
   const images =
-    extractImages(d);
+    extractImages(
+      d
+    );
 
-  const duration =
+  const durationValue =
     Number(
       video.duration ??
-      d.duration
+        d.duration
     );
 
   const id =
@@ -485,28 +874,37 @@ function normalizeTikTokData(
         : undefined,
 
     title:
-      typeof title === "string"
-        ? cleanText(title)
+      typeof title ===
+      "string"
+        ? cleanText(
+            title
+          )
         : undefined,
 
     author: {
       username:
-        typeof username === "string"
+        typeof username ===
+        "string"
           ? username
           : undefined,
 
       nickname:
-        typeof nickname === "string"
+        typeof nickname ===
+        "string"
           ? nickname
           : undefined
     },
 
     thumbnail:
-      cleanUrl(cover),
+      cleanUrl(
+        cover
+      ),
 
     duration:
-      Number.isFinite(duration)
-        ? duration
+      Number.isFinite(
+        durationValue
+      )
+        ? durationValue
         : undefined,
 
     video:
@@ -516,7 +914,7 @@ function normalizeTikTokData(
             hd:
               cleanUrl(
                 downloadAddr ??
-                playAddr
+                  playAddr
               ),
 
             sd:
@@ -529,8 +927,10 @@ function normalizeTikTokData(
       firstUrl([
         video.music?.playUrl,
         video.music?.play_url,
+        video.music?.url,
         d.music?.playUrl,
-        d.music?.play_url
+        d.music?.play_url,
+        d.music?.url
       ]),
 
     images:
@@ -554,29 +954,52 @@ function extractImages(
   ];
 
   for (
-    const list of candidates
+    const list of
+      candidates
   ) {
-    if (!Array.isArray(list)) {
+    if (
+      !Array.isArray(
+        list
+      )
+    ) {
       continue;
     }
 
     const result =
       list
-        .map((item: any) => {
-          if (typeof item === "string") {
-            return cleanUrl(item);
+        .map(
+          (
+            item: any
+          ) => {
+            if (
+              typeof item ===
+                "string"
+            ) {
+              return cleanUrl(
+                item
+              );
+            }
+
+            return firstUrl([
+              item?.displayImage
+                ?.urlList
+                ?.[0],
+
+              item?.originUrl,
+
+              item?.url,
+
+              item?.src
+            ]);
           }
+        )
+        .filter(
+          Boolean
+        ) as string[];
 
-          return firstUrl([
-            item?.displayImage?.urlList?.[0],
-            item?.originUrl,
-            item?.url,
-            item?.src
-          ]);
-        })
-        .filter(Boolean) as string[];
-
-    if (result.length) {
+    if (
+      result.length
+    ) {
       return result;
     }
   }
@@ -585,7 +1008,7 @@ function extractImages(
 }
 
 /*
- * Download URL media langsung
+ * Download media URL langsung
  */
 export async function downloadMedia(
   mediaUrl: string,
@@ -596,37 +1019,55 @@ export async function downloadMedia(
 
   const timer =
     setTimeout(
-      () => controller.abort(),
+      () =>
+        controller.abort(),
       120_000
     );
 
   try {
     const response =
-      await fetch(mediaUrl, {
-        headers: {
-          "user-agent": UA,
-          accept: "*/*",
-          referer:
-            "https://www.tiktok.com/"
-        },
-        redirect: "follow",
-        signal: controller.signal
-      });
+      await fetch(
+        mediaUrl,
+        {
+          headers: {
+            "user-agent":
+              UA,
 
-    if (!response.ok) {
+            accept:
+              "*/*",
+
+            referer:
+              "https://www.tiktok.com/"
+          },
+
+          redirect:
+            "follow",
+
+          signal:
+            controller.signal
+        }
+      );
+
+    if (
+      !response.ok
+    ) {
       throw new Error(
         `Media returned HTTP ${response.status}`
       );
     }
 
-    if (!response.body) {
+    if (
+      !response.body
+    ) {
       throw new Error(
         "Response video kosong"
       );
     }
 
     const fs =
-      await import("node:fs");
+      await import(
+        "node:fs"
+      );
 
     const stream =
       Readable.fromWeb(
@@ -634,17 +1075,23 @@ export async function downloadMedia(
       );
 
     await new Promise<void>(
-      (resolve, reject) => {
+      (
+        resolve,
+        reject
+      ) => {
         const output =
           fs.createWriteStream(
             destination
           );
 
-        stream.pipe(output);
+        stream.pipe(
+          output
+        );
 
         output.on(
           "finish",
-          resolve
+          () =>
+            resolve()
         );
 
         output.on(
@@ -659,10 +1106,13 @@ export async function downloadMedia(
       }
     );
 
-  } catch (error) {
+  } catch (
+    error
+  ) {
     if (
       error instanceof Error &&
-      error.name === "AbortError"
+      error.name ===
+        "AbortError"
     ) {
       throw new Error(
         "Download video terlalu lama"
@@ -670,8 +1120,11 @@ export async function downloadMedia(
     }
 
     throw error;
+
   } finally {
-    clearTimeout(timer);
+    clearTimeout(
+      timer
+    );
   }
 }
 
@@ -679,12 +1132,17 @@ function firstUrl(
   values: any[]
 ): string | undefined {
   for (
-    const value of values
+    const value of
+      values
   ) {
     const url =
-      cleanUrl(value);
+      cleanUrl(
+        value
+      );
 
-    if (url) {
+    if (
+      url
+    ) {
       return url;
     }
   }
@@ -696,7 +1154,8 @@ function cleanUrl(
   value: any
 ): string | undefined {
   if (
-    typeof value !== "string" ||
+    typeof value !==
+      "string" ||
     !value
   ) {
     return undefined;
@@ -704,20 +1163,48 @@ function cleanUrl(
 
   let url =
     value
-      .replace(/\\u002F/g, "/")
-      .replace(/\\u0026/g, "&")
-      .replace(/\\"/g, '"')
-      .replace(/\\\\/g, "\\");
+      .replace(
+        /\\u002F/g,
+        "/"
+      )
+      .replace(
+        /\\u0026/g,
+        "&"
+      )
+      .replace(
+        /\\"/g,
+        '"'
+      )
+      .replace(
+        /\\\\/g,
+        "\\"
+      );
+
+  url =
+    htmlDecode(
+      url
+    );
+
+  url =
+    decodeURIComponentSafe(
+      url
+    );
 
   if (
-    url.startsWith("//")
+    url.startsWith(
+      "//"
+    )
   ) {
     url =
-      "https:" + url;
+      "https:" +
+      url;
   }
 
   try {
-    return new URL(url).href;
+    return new URL(
+      url
+    ).href;
+
   } catch {
     return undefined;
   }
@@ -728,7 +1215,9 @@ function findUrl(
   regex: RegExp
 ): string | undefined {
   const match =
-    html.match(regex);
+    html.match(
+      regex
+    );
 
   return cleanUrl(
     match?.[1]
@@ -739,15 +1228,23 @@ function findString(
   html: string,
   regex: RegExp
 ): string | undefined {
-  return html.match(regex)?.[1];
+  return html.match(
+    regex
+  )?.[1];
 }
 
 function cleanText(
   text: string
 ): string {
   return text
-    .replace(/\\n/g, "\n")
-    .replace(/\\"/g, '"')
+    .replace(
+      /\\n/g,
+      "\n"
+    )
+    .replace(
+      /\\"/g,
+      '"'
+    )
     .trim();
 }
 
@@ -755,11 +1252,38 @@ function htmlDecode(
   value: string
 ): string {
   return value
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">");
+    .replace(
+      /&quot;/g,
+      '"'
+    )
+    .replace(
+      /&#39;/g,
+      "'"
+    )
+    .replace(
+      /&amp;/g,
+      "&"
+    )
+    .replace(
+      /&lt;/g,
+      "<"
+    )
+    .replace(
+      /&gt;/g,
+      ">"
+    );
+}
+
+function decodeURIComponentSafe(
+  value: string
+): string {
+  try {
+    return decodeURIComponent(
+      value
+    );
+  } catch {
+    return value;
+  }
 }
 
 function escapeRegExp(
