@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
 import { downloadTikTok, providerReferer, providerUserAgent } from "../services/downloader.js";
 import { isAllowedMediaUrl, isTikTokUrl, safeFileName } from "../utils/validator.js";
 import { rateLimit } from "../utils/rateLimit.js";
@@ -57,12 +58,12 @@ router.get("/download", rateLimit(60, 60_000), async (req, res) => {
     res.setHeader("content-disposition", `attachment; filename="${name}"`);
     res.setHeader("cache-control", "no-store");
 
-    Readable.fromWeb(upstream.body as any).pipe(res);
+    await pipeline(Readable.fromWeb(upstream.body as any), res);
   } catch {
     if (!res.headersSent) {
       res.status(502).json({ success: false, error: { message: "Gagal mengambil file, coba lagi." } });
-    } else {
-      res.end();
+    } else if (!res.writableEnded) {
+      res.destroy();
     }
   }
 });
