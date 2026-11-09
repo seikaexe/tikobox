@@ -43,7 +43,7 @@ Cara kerjanya:
 
 - `src/server.ts` mengekspor app Express sebagai default export, dan Vercel menjalankannya sebagai satu function
 - `public/` dilayani CDN Vercel, jadi `/` dan semua file di `/assets` tidak melewati function
-- `vercel.json` hanya mengarahkan `/docs` ke `docs.html`
+- `vercel.json` hanya menyertakan folder `public/` ke dalam function, dan Express melayani `/` serta `/docs`
 - Jalur `/api/*` ditangani Express (`/api/tiktok`, `/api/download`, `/api/health`)
 
 Untuk cek tipe sebelum deploy, jalankan `npm run typecheck`.
