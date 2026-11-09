@@ -1,4 +1,4 @@
-# TikoBox
+# Tikobox
 
 TikTok Downloader (TypeScript + Express) dengan tema Neobrutalism. Provider: tikwm.
 
