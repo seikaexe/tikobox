@@ -22,6 +22,30 @@ Base URL otomatis mengikuti domain tempat situs dibuka. Buka `BASE_URL/?url=LINK
 
 API: `BASE_URL/api/` lalu tempel link TikTok apa adanya, hasilnya JSON. Contoh: `BASE_URL/api/https://vt.tiktok.com/xxxx`.
 
+## Response API
+
+Formatnya mirip tikwm:
+
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "processed_time": 1.2345,
+  "data": {
+    "id": "...", "title": "...", "cover": "...", "origin_cover": "...", "duration": 15,
+    "play": "mp4 tanpa watermark", "wmplay": "mp4 watermark", "hdplay": "mp4 HD",
+    "size": 0, "wm_size": 0, "hd_size": 0,
+    "music": "mp3", "music_info": { "id": "", "title": "", "play": "", "cover": "", "author": "" },
+    "play_count": 0, "digg_count": 0, "comment_count": 0, "share_count": 0, "collect_count": 0,
+    "create_time": 0,
+    "author": { "id": "", "unique_id": "", "nickname": "", "avatar": "" },
+    "images": ["hanya untuk postingan foto"]
+  }
+}
+```
+
+Kalau gagal: `{ "code": -1, "msg": "pesan error" }`.
+
 ## Menjalankan
 
 ```bash

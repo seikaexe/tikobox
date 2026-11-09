@@ -9,7 +9,7 @@ app.set("trust proxy", true);
 
 app.use("/api", apiRouter);
 app.use("/api", (_req, res) => {
-  res.status(404).json({ success: false, error: { message: "Endpoint tidak ditemukan." } });
+  res.status(404).json({ code: -1, msg: "Endpoint tidak ditemukan." });
 });
 
 // Di Vercel, folder public/ dilayani CDN dan express.static diabaikan, jadi
@@ -29,7 +29,7 @@ app.get("/docs", sendPage("docs.html"));
 app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err);
   if (res.headersSent) return;
-  res.status(500).json({ success: false, error: { message: "Terjadi kesalahan pada server." } });
+  res.status(500).json({ code: -1, msg: "Terjadi kesalahan pada server." });
 });
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);

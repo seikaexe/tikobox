@@ -38,6 +38,22 @@ function setProgress(pct, label) {
   if (label) progressLabel.textContent = label;
 }
 
+// Ubah response API (format tikwm) ke bentuk yang dipakai tampilan
+function adapt(d) {
+  const slides = Array.isArray(d.images) && d.images.length;
+  const hd = d.hdplay && d.hdplay !== d.play ? d.hdplay : undefined;
+  return {
+    id: d.id,
+    title: d.title,
+    author: { username: d.author?.unique_id, nickname: d.author?.nickname },
+    thumbnail: d.origin_cover || d.cover,
+    video: slides ? undefined : { hd, sd: d.play || d.hdplay, hdSize: d.hd_size, sdSize: d.size },
+    audio: d.music,
+    images: slides ? d.images : undefined,
+    cookie: d.cookie
+  };
+}
+
 function esc(value) {
   return String(value ?? "").replace(/[&<>"']/g, (c) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
@@ -81,7 +97,7 @@ async function getBlob(url, name, { size = 0, from = 0, label = "Mengunduh" } = 
   const res = await fetch(proxyUrl(url, name));
   if (!res.ok) {
     const err = await res.json().catch(() => null);
-    throw new Error(err?.error?.message || "Gagal mengambil file, coba lagi.");
+    throw new Error(err?.msg || "Gagal mengambil file, coba lagi.");
   }
 
   let blob;
@@ -241,9 +257,9 @@ form.addEventListener("submit", async (event) => {
     const res = await fetch(`${API}/tiktok?url=${encodeURIComponent(url)}`);
     const json = await res.json().catch(() => null);
     clearInterval(ticker);
-    if (!res.ok || !json?.success) throw new Error(json?.error?.message || "Gagal memproses URL");
+    if (!res.ok || json?.code !== 0) throw new Error(json?.msg || "Gagal memproses URL");
 
-    current = json.data;
+    current = adapt(json.data);
     render(current);
     setProgress(100, "Selesai diproses, silakan download");
   } catch (error) {

@@ -8,20 +8,44 @@ import { Readable } from "node:stream";
 
 export type TikTokResult = {
   id?: string;
+  region?: string;
   title?: string;
+  createTime?: number;
+  duration?: number;
+  thumbnail?: string;
+  cover?: string;
+  originCover?: string;
   author?: {
+    id?: string;
     username?: string;
     nickname?: string;
+    avatar?: string;
   };
-  thumbnail?: string;
-  duration?: number;
   video?: {
     hd?: string;
     sd?: string;
+    wm?: string;
     hdSize?: number;
     sdSize?: number;
+    wmSize?: number;
   };
   audio?: string;
+  music?: {
+    id?: string;
+    title?: string;
+    author?: string;
+    cover?: string;
+    original?: boolean;
+    duration?: number;
+    album?: string;
+  };
+  stats?: {
+    play?: number;
+    digg?: number;
+    comment?: number;
+    share?: number;
+    collect?: number;
+  };
   images?: string[];
   cookie?: string;
 };
@@ -73,31 +97,8 @@ export async function downloadTikTok(
   const { html, cookie } =
     await fetchHtml(finalUrl);
 
-  const data =
-    extractTikTokData(html);
-
-  if (!data) {
-    throw new Error(
-      "Data video TikTok tidak ditemukan di halaman"
-    );
-  }
-
   const result =
-    normalizeTikTokData(
-      data,
-      html
-    );
-
-  if (
-    !result.id &&
-    !result.video?.hd &&
-    !result.video?.sd &&
-    !result.images?.length
-  ) {
-    throw new Error(
-      "URL video tidak ditemukan. TikTok mungkin memblokir halaman atau mengubah struktur HTML"
-    );
-  }
+    parseTikTokHtml(html);
 
   /*
    * Cookie sesi dari TikTok sendiri, dipakai proxy
@@ -583,6 +584,21 @@ function extractTikTokData(
       "__UNIVERSAL_DATA_FOR_REHYDRATION__"
     );
 
+  const direct =
+    universal
+      ?.__DEFAULT_SCOPE__
+      ?.["webapp.video-detail"]
+      ?.itemInfo
+      ?.itemStruct;
+
+  if (
+    direct &&
+    typeof direct ===
+      "object"
+  ) {
+    return direct;
+  }
+
   if (
     universal
   ) {
@@ -603,6 +619,20 @@ function extractTikTokData(
       html,
       "SIGI_STATE"
     );
+
+  const sigiItem =
+    sigi?.ItemModule &&
+    Object.values(
+      sigi.ItemModule
+    )[0];
+
+  if (
+    sigiItem &&
+    typeof sigiItem ===
+      "object"
+  ) {
+    return sigiItem;
+  }
 
   if (
     sigi
@@ -654,15 +684,19 @@ function extractScriptJson(
     return null;
   }
 
-  try {
-    return JSON.parse(
-      htmlDecode(
-        match[1].trim()
-      )
-    );
+  const raw =
+    match[1].trim();
 
+  try {
+    return JSON.parse(raw);
   } catch {
-    return null;
+    try {
+      return JSON.parse(
+        htmlDecode(raw)
+      );
+    } catch {
+      return null;
+    }
   }
 }
 
@@ -865,6 +899,286 @@ function extractFromHtml(
 }
 
 /*
+ * Parse HTML halaman TikTok menjadi hasil akhir
+ */
+export function parseTikTokHtml(
+  html: string
+): TikTokResult {
+  /*
+   * Status dari TikTok sendiri (privat, dihapus, dll)
+   */
+  const universal =
+    extractScriptJson(
+      html,
+      "__UNIVERSAL_DATA_FOR_REHYDRATION__"
+    );
+
+  const detail =
+    universal
+      ?.__DEFAULT_SCOPE__
+      ?.["webapp.video-detail"];
+
+  if (
+    detail &&
+    Number(detail.statusCode) > 0 &&
+    !detail.itemInfo?.itemStruct
+  ) {
+    throw new Error(
+      "Video tidak tersedia (privat, dihapus, atau dibatasi wilayah)"
+    );
+  }
+
+  const data =
+    extractTikTokData(html);
+
+  if (!data) {
+    if (
+      /captcha|verify-bar|security check/i.test(
+        html
+      )
+    ) {
+      throw new Error(
+        "TikTok meminta verifikasi (captcha) untuk server ini, coba lagi nanti"
+      );
+    }
+
+    throw new Error(
+      "Data video TikTok tidak ditemukan di halaman"
+    );
+  }
+
+  const result =
+    normalizeTikTokData(
+      data,
+      html
+    );
+
+  if (
+    !result.video?.hd &&
+    !result.video?.sd &&
+    !result.video?.wm &&
+    !result.images?.length
+  ) {
+    const v =
+      data.video ?? {};
+
+    const info = [
+      `playAddr=${v.playAddr ? "ada" : "kosong"}`,
+      `downloadAddr=${v.downloadAddr ? "ada" : "kosong"}`,
+      `bitrateInfo=${Array.isArray(v.bitrateInfo) ? v.bitrateInfo.length : 0}`
+    ].join(", ");
+
+    console.warn(
+      "[Tikobox] URL video kosong:",
+      info
+    );
+
+    throw new Error(
+      `URL video tidak ada di halaman TikTok (${info}). TikTok mungkin menyembunyikan video dari IP server`
+    );
+  }
+
+  return result;
+}
+
+/*
+ * Ambil semua URL dari string, array, atau object
+ * { UrlList / urlList / url_list / url }
+ */
+function urlsFrom(
+  value: any
+): string[] {
+  if (!value) {
+    return [];
+  }
+
+  if (
+    typeof value ===
+    "string"
+  ) {
+    const u =
+      cleanUrl(
+        value
+      );
+
+    return u
+      ? [u]
+      : [];
+  }
+
+  if (
+    Array.isArray(
+      value
+    )
+  ) {
+    return value.flatMap(
+      urlsFrom
+    );
+  }
+
+  if (
+    typeof value ===
+    "object"
+  ) {
+    return urlsFrom(
+      value.UrlList ??
+        value.urlList ??
+        value.url_list ??
+        value.url ??
+        value.Url
+    );
+  }
+
+  return [];
+}
+
+function numberOrUndefined(
+  value: any
+): number | undefined {
+  const n =
+    Number(
+      value
+    );
+
+  return Number.isFinite(
+    n
+  ) && n > 0
+    ? n
+    : undefined;
+}
+
+/*
+ * Pilih URL video:
+ *
+ * hd  = bitrate tertinggi (tanpa watermark)
+ * sd  = playAddr (tanpa watermark)
+ * wm  = downloadAddr (biasanya ada watermark)
+ */
+function pickVideoUrls(
+  video: any,
+  d: any,
+  html: string
+) {
+  const infos: any[] =
+    Array.isArray(
+      video.bitrateInfo
+    )
+      ? video.bitrateInfo
+      : Array.isArray(
+            video.bit_rate
+          )
+        ? video.bit_rate
+        : [];
+
+  const ranked =
+    infos
+      .map((b: any) => ({
+        url:
+          urlsFrom(
+            b?.PlayAddr ??
+              b?.play_addr
+          )[0],
+
+        bitrate:
+          Number(
+            b?.Bitrate ??
+              b?.bit_rate
+          ) || 0,
+
+        size:
+          numberOrUndefined(
+            b?.PlayAddr
+              ?.DataSize ??
+              b?.play_addr
+                ?.data_size
+          )
+      }))
+      .filter(
+        (x) => x.url
+      )
+      .sort(
+        (a, b) =>
+          b.bitrate -
+          a.bitrate
+      );
+
+  let play: string | undefined =
+    urlsFrom([
+      video.playAddr,
+      video.PlayAddrStruct,
+      video.play_addr,
+      d.playAddr,
+      d.play_addr
+    ])[0];
+
+  let wm: string | undefined =
+    urlsFrom([
+      video.downloadAddr,
+      video.download_addr,
+      d.downloadAddr,
+      d.download_addr
+    ])[0];
+
+  /*
+   * Fallback regex kalau JSON tidak memuat URL
+   */
+  if (
+    !play &&
+    !ranked.length
+  ) {
+    play =
+      findUrl(
+        html,
+        /"playAddr"\s*:\s*"([^"]+)"/i
+      ) ??
+      findUrl(
+        html,
+        /"UrlList"\s*:\s*\[\s*"([^"]+)"/i
+      );
+  }
+
+  if (
+    !wm
+  ) {
+    wm =
+      findUrl(
+        html,
+        /"downloadAddr"\s*:\s*"([^"]+)"/i
+      );
+  }
+
+  const hd =
+    ranked[0]?.url ??
+    play;
+
+  const sd =
+    play ??
+    ranked[
+      ranked.length - 1
+    ]?.url;
+
+  return {
+    hd,
+    sd,
+    wm,
+
+    hdSize:
+      ranked[0]?.size,
+
+    sdSize:
+      ranked.find(
+        (x) =>
+          x.url === sd
+      )?.size,
+
+    wmSize:
+      numberOrUndefined(
+        video.size
+      )
+  };
+}
+
+/*
  * Normalisasi object TikTok
  */
 function normalizeTikTokData(
@@ -875,49 +1189,50 @@ function normalizeTikTokData(
     d.video ??
     {};
 
-  const playAddr =
-    firstUrl([
-      video.playAddr,
-      video.play_addr,
-      video.playAddrH264,
-      video.playAddrBytevc1,
-      d.playAddr,
-      d.play_addr
-    ]);
+  const urls =
+    pickVideoUrls(
+      video,
+      d,
+      html
+    );
 
-  const downloadAddr =
+  const originCover =
     firstUrl([
-      video.downloadAddr,
-      video.download_addr,
-      video.downloadAddrH264,
-      d.downloadAddr,
-      d.download_addr
+      video.originCover,
+      video.origin_cover,
+      d.originCover,
+      d.origin_cover
     ]);
 
   const cover =
     firstUrl([
       video.cover,
-      video.originCover,
-      video.origin_cover,
       video.coverUrl,
-      d.cover,
-      d.originCover,
-      d.origin_cover
+      d.cover
     ]) ??
     findUrl(
       html,
-      /"originCover"\s*:\s*"([^"]+)"/i
+      /"cover"\s*:\s*"([^"]+)"/i
     );
 
+  const rawAuthor =
+    d.author;
+
+  const author: any =
+    typeof rawAuthor ===
+    "string"
+      ? { uniqueId: rawAuthor }
+      : rawAuthor ?? {};
+
   const username =
-    d.author?.uniqueId ??
-    d.author?.unique_id ??
-    d.author?.username ??
+    author.uniqueId ??
+    author.unique_id ??
+    author.username ??
     d.authorMeta?.name;
 
   const nickname =
-    d.author?.nickname ??
-    d.author?.nickName ??
+    author.nickname ??
+    author.nickName ??
     d.authorMeta?.nickName;
 
   const images =
@@ -942,10 +1257,34 @@ function normalizeTikTokData(
     d.title ??
     d.text;
 
+  const m =
+    d.music ??
+    {};
+
+  const st =
+    d.stats ??
+    {};
+
+  const audio =
+    firstUrl([
+      m.playUrl,
+      m.play_url,
+      m.url,
+      video.music?.playUrl,
+      video.music?.play_url,
+      video.music?.url
+    ]);
+
   return {
     id:
       id != null
         ? String(id)
+        : undefined,
+
+    region:
+      typeof d.locationCreated ===
+      "string"
+        ? d.locationCreated
         : undefined,
 
     title:
@@ -956,7 +1295,18 @@ function normalizeTikTokData(
           )
         : undefined,
 
+    createTime:
+      numberOrUndefined(
+        d.createTime ??
+          d.create_time
+      ),
+
     author: {
+      id:
+        author.id != null
+          ? String(author.id)
+          : undefined,
+
       username:
         typeof username ===
         "string"
@@ -967,13 +1317,23 @@ function normalizeTikTokData(
         typeof nickname ===
         "string"
           ? nickname
-          : undefined
+          : undefined,
+
+      avatar:
+        firstUrl([
+          author.avatarLarger,
+          author.avatarMedium,
+          author.avatarThumb,
+          author.avatar
+        ])
     },
 
     thumbnail:
-      cleanUrl(
-        cover
-      ),
+      originCover ??
+      cover,
+
+    cover,
+    originCover,
 
     duration:
       Number.isFinite(
@@ -985,28 +1345,73 @@ function normalizeTikTokData(
     video:
       images.length
         ? undefined
-        : {
-            hd:
-              cleanUrl(
-                downloadAddr ??
-                  playAddr
+        : urls,
+
+    audio,
+
+    music:
+      d.music
+        ? {
+            id:
+              m.id != null
+                ? String(m.id)
+                : undefined,
+
+            title:
+              m.title,
+
+            author:
+              m.authorName,
+
+            cover:
+              firstUrl([
+                m.coverLarge,
+                m.coverMedium,
+                m.coverThumb
+              ]),
+
+            original:
+              typeof m.original ===
+              "boolean"
+                ? m.original
+                : undefined,
+
+            duration:
+              numberOrUndefined(
+                m.duration
               ),
 
-            sd:
-              cleanUrl(
-                playAddr
-              )
-          },
+            album:
+              m.album
+          }
+        : undefined,
 
-    audio:
-      firstUrl([
-        video.music?.playUrl,
-        video.music?.play_url,
-        video.music?.url,
-        d.music?.playUrl,
-        d.music?.play_url,
-        d.music?.url
-      ]),
+    stats: {
+      play:
+        numberOrUndefined(
+          st.playCount
+        ),
+
+      digg:
+        numberOrUndefined(
+          st.diggCount
+        ),
+
+      comment:
+        numberOrUndefined(
+          st.commentCount
+        ),
+
+      share:
+        numberOrUndefined(
+          st.shareCount
+        ),
+
+      collect:
+        numberOrUndefined(
+          st.collectCount
+        )
+    },
 
     images:
       images.length
@@ -1056,6 +1461,10 @@ function extractImages(
             }
 
             return firstUrl([
+              item?.imageURL
+                ?.urlList
+                ?.[0],
+
               item?.displayImage
                 ?.urlList
                 ?.[0],

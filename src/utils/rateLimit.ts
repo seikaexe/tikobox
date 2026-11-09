@@ -23,7 +23,7 @@ export function rateLimit(max: number, windowMs: number) {
 
     if (bucket.count > max) {
       res.setHeader("retry-after", String(Math.ceil((bucket.reset - now) / 1000)));
-      res.status(429).json({ success: false, error: { message: "Terlalu banyak permintaan. Coba lagi sebentar lagi." } });
+      res.status(429).json({ code: -1, msg: "Terlalu banyak permintaan. Coba lagi sebentar lagi." });
       return;
     }
     next();
