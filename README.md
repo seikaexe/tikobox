@@ -1,6 +1,6 @@
 # Tikobox
 
-TikTok Downloader (TypeScript + Express) dengan tema Neobrutalism. Provider: tikwm.
+TikTok Downloader (TypeScript + Express) dengan tema Neobrutalism. Tanpa layanan pihak ketiga: semua data diambil langsung dari TikTok.
 
 ## Halaman
 
@@ -11,8 +11,16 @@ TikTok Downloader (TypeScript + Express) dengan tema Neobrutalism. Provider: tik
 
 - `public/` berisi halaman website
 - `src/routes/` berisi route internal yang dipakai halaman
-- `src/services/downloader.ts` berisi adapter tikwm
+- `src/services/downloader.ts` berisi pengambil data langsung dari TikTok
 - `src/utils/` berisi validator dan rate limit
+
+## Link yang didukung
+
+`tiktok.com`, `vt.tiktok.com`, `vm.tiktok.com`, `tt.site`, `www.tt.site` (boleh tanpa `https://`).
+
+Base URL otomatis mengikuti domain tempat situs dibuka. Buka `BASE_URL/?url=LINK` dan video langsung diproses.
+
+API: `BASE_URL/api/` lalu tempel link TikTok apa adanya, hasilnya JSON. Contoh: `BASE_URL/api/https://vt.tiktok.com/xxxx`.
 
 ## Menjalankan
 

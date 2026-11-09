@@ -1,4 +1,5 @@
 <!doctype html>
+
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -26,9 +27,6 @@
   <meta name="twitter:title" content="Panduan - Tikobox">
   <meta name="twitter:description" content="Panduan penggunaan Tikobox TikTok Downloader.">
   <meta name="twitter:image" content="https://tikobox.vercel.app/og-image.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
@@ -38,49 +36,83 @@
     <a href="/">Home</a>
     <a class="active" href="/docs">Docs</a>
   </div>
-</nav>
-
-<main class="docs">
-
-  <article class="doc-content">
+</nav><main class="docs">  <article class="doc-content">
     <div class="badge">PANDUAN</div>
     <h1 id="intro">Panduan Tikobox</h1>
-    <p>Tikobox dipakai untuk mengunduh video tikTok tanpa watermark, tempel link, lalu video langsung tersimpan di perangkat kamu.</p>
+    <p>Tikobox dipakai untuk mengunduh video tikTok tanpa watermark, tempel link, lalu video langsung tersimpan di perangkat kamu.</p><h2 id="baseurl">Base URL</h2>
+<p>Alamat utama untuk mengakses Tikobox</p>
+<div class="baseurl">
+  <code id="baseUrl">https://tikobox.my.id</code>
+  <button id="copyBase" class="btn btn-primary btn-sm" type="button">SALIN</button>
+</div>
 
-    <h2 id="baseurl">Base URL</h2>
-    <p>Alamat utama Tikobox ada di bawah ini.</p>
-    <div class="baseurl">
-      <code id="baseUrl">https://tikobox.my.id</code>
-      <button id="copyBase" class="btn btn-primary btn-sm" type="button">SALIN</button>
-    </div>
+<h2 id="api">Tikobox API</h2>
+<p>Gunakan endpoint berikut untuk mengakses API Tikobox</p>
 
-    <h2 id="cara">Cara Pakai</h2>
-    <ol>
-      <li>Buka TikTok, pilih video, lalu tekan <b>Bagikan</b>, lalu <b>Salin tautan</b>.</li>
-      <li>Buka Base URL di atas, tempel tautan pada kolom yang tersedia.</li>
-      <li>Tekan <b>DOWNLOAD</b> dan tunggu proses link selesai.</li>
-      <li>Setelah hasil muncul, tekan tombol download pada video untuk menyimpannya.</li>
-      <li>Video langsung tersimpan ke galeri.</li>
-    </ol>
+<div class="baseurl">
+  <code id="apiUrl">https://tikobox.my.id/api/</code>
+  <button id="copyApi" class="btn btn-primary btn-sm" type="button">SALIN</button>
+</div>
 
-    <h2 id="galeri">Simpan ke Galeri</h2>
-    <div class="platforms">
-      <div><h3>Android</h3><p>File langsung diunduh dan otomatis muncul di aplikasi Galeri atau Google Foto.</p></div>
-      <div><h3>iPhone</h3><p>Tekan <b>Simpan ke Galeri</b>, lalu pilih <b>Simpan Video</b> pada menu yang muncul.</p></div>
-      <div><h3>Desktop</h3><p>File langsung diunduh ke folder Downloads di komputer kamu.</p></div>
-    </div>
+<h2 id="cara">Cara Pakai</h2>
+<ol>
+  <li>Buka TikTok, pilih video, lalu tekan <b>Bagikan</b>, lalu <b>Salin tautan</b>.</li>
+  <li>Buka Base URL di atas, tempel tautan pada kolom yang tersedia.</li>
+  <li>Tekan <b>DOWNLOAD</b> dan tunggu proses link selesai.</li>
+  <li>Setelah hasil muncul, tekan tombol download pada video untuk menyimpannya.</li>
+  <li>Video langsung tersimpan ke galeri.</li>
+</ol>
 
-    <h2 id="catatan">Catatan</h2>
-    <div class="note">Gunakan hanya untuk video milik kamu atau yang kamu punya izin mengunduhnya.</div>
-    <ul>
-      <li>Video harus berstatus publik.</li>
-      <li>Jika gagal, periksa tautan lalu coba lagi beberapa saat kemudian.</li>
-      <li>Postingan foto (slideshow) tersimpan sebagai gambar.</li>
-    </ul>
+<h2 id="galeri">Simpan ke Galeri</h2>
+<div class="platforms">
+  <div>
+    <h3>Android</h3>
+    <p>File langsung diunduh dan otomatis muncul di aplikasi Galeri atau Google Foto.</p>
+  </div>
+
+  <div>
+    <h3>iPhone</h3>
+    <p>Tekan <b>Simpan ke Galeri</b>, lalu pilih <b>Simpan Video</b> pada menu yang muncul.</p>
+  </div>
+
+  <div>
+    <h3>Desktop</h3>
+    <p>File langsung diunduh ke folder Downloads di komputer kamu.</p>
+  </div>
+</div>
+
+<h2 id="catatan">Catatan</h2>
+<div class="note">Gunakan hanya untuk video milik kamu atau yang kamu punya izin mengunduhnya.</div>
+
+<ul>
+  <li>Video harus berstatus publik.</li>
+  <li>Jika gagal, periksa tautan lalu coba lagi beberapa saat kemudian.</li>
+  <li>Postingan foto (slideshow) tersimpan sebagai gambar.</li>
+</ul>
+
   </article>
-</main>
+</main><footer>
+  <span>© 2026 Tikobox</span>
+  <span>Panduan</span>
+</footer><script src="/assets/js/docs.js" defer></script><script>
+  document.getElementById("copyApi")?.addEventListener("click", async () => {
+    const text = document.getElementById("apiUrl").textContent.trim()
+    const button = document.getElementById("copyApi")
 
-<footer><span>© 2026 Tikobox</span><span>Panduan</span></footer>
-<script src="/assets/js/docs.js" defer></script>
-</body>
+    try {
+      await navigator.clipboard.writeText(text)
+      button.textContent = "TERSALIN"
+
+      setTimeout(() => {
+        button.textContent = "SALIN"
+      }, 1500)
+    } catch {
+      button.textContent = "GAGAL"
+
+      setTimeout(() => {
+        button.textContent = "SALIN"
+      }, 1500)
+    }
+  })
+</script></body>
 </html>

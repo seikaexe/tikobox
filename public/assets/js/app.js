@@ -14,6 +14,9 @@ const isIOS =
   /iPad|iPhone|iPod/.test(navigator.userAgent) ||
   (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
+// Base URL otomatis: API selalu diambil dari domain tempat halaman ini dibuka
+const API = `${location.origin}/api`;
+
 const blobCache = new Map();
 let current = null;
 let progressNow = 0;
@@ -42,7 +45,29 @@ function esc(value) {
 }
 
 function proxyUrl(url, name) {
-  return `/api/download?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name)}`;
+  const c = current?.cookie ? `&c=${encodeURIComponent(current.cookie)}` : "";
+  return `${API}/download?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name)}${c}`;
+}
+
+// Gambar lewat proxy supaya tidak diblokir hotlink/referrer TikTok
+function imgProxy(url) {
+  return `${API}/download?url=${encodeURIComponent(url)}&name=img.jpg&inline=1`;
+}
+
+function imgTag(url, cls, alt, id = "") {
+  const fallback = "if(this.dataset.src&&this.src!==this.dataset.src){this.src=this.dataset.src}";
+  return `<img ${id ? `id="${id}" ` : ""}class="${cls}" src="${esc(imgProxy(url))}" data-src="${esc(url)}" alt="${alt}" referrerpolicy="no-referrer" onerror="${fallback}">`;
+}
+
+// Ambil link TikTok / tt.site dari teks yang ditempel (boleh tanpa https://)
+function normalizeInput(raw) {
+  const text = String(raw || "").trim();
+  const m =
+    text.match(/https?:\/\/[^\s"'<>]+/i) ||
+    text.match(/(?<![a-z0-9-])(?:[a-z0-9-]+\.)*(?:tiktok\.com|tt\.site)\/[^\s"'<>]*/i);
+  if (!m) return text;
+  const link = m[0].replace(/[.,;:!?)\]]+$/, "");
+  return /^https?:\/\//i.test(link) ? link : "https://" + link;
 }
 
 // Unduh file lewat proxy sambil menghitung persen. Rentang persen: from sampai 100.
@@ -54,7 +79,10 @@ async function getBlob(url, name, { size = 0, from = 0, label = "Mengunduh" } = 
 
   setProgress(from, label);
   const res = await fetch(proxyUrl(url, name));
-  if (!res.ok) throw new Error("Gagal mengambil file, coba lagi.");
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.error?.message || "Gagal mengambil file, coba lagi.");
+  }
 
   let blob;
   if (!res.body) {
@@ -125,7 +153,7 @@ function showSlide(i) {
   slideIndex = (i + list.length) % list.length;
   const img = $("slideImg");
   const count = $("slideCount");
-  if (img) img.src = list[slideIndex];
+  if (img) { img.dataset.src = list[slideIndex]; img.src = imgProxy(list[slideIndex]); }
   if (count) count.textContent = `${slideIndex + 1} / ${list.length}`;
 }
 
@@ -148,7 +176,7 @@ function render(d) {
   const author = d.author?.username ? "@" + d.author.username : d.author?.nickname || "-";
   const base = fileBase(d);
   const isSlides = !best && d.images?.length;
-  let media = d.thumbnail ? `<img class="thumb" src="${esc(d.thumbnail)}" alt="Thumbnail" referrerpolicy="no-referrer">` : "";
+  let media = d.thumbnail ? imgTag(d.thumbnail, "thumb", "Thumbnail") : "";
   let actions = "";
 
   if (best) {
@@ -163,10 +191,10 @@ function render(d) {
   } else if (isSlides) {
     const n = d.images.length;
     slideIndex = 0;
-    d.images.forEach((u) => { const im = new Image(); im.src = u; });
+    d.images.forEach((u) => { const im = new Image(); im.src = imgProxy(u); });
     media = `
       <div class="slider" id="slider">
-        <img class="thumb" id="slideImg" src="${esc(d.images[0])}" alt="Foto" referrerpolicy="no-referrer">
+        ${imgTag(d.images[0], "thumb", "Foto", "slideImg")}
         ${n > 1 ? `<button class="slide-btn prev" type="button" data-act="prev" aria-label="Foto sebelumnya">&lt;</button>
         <button class="slide-btn next" type="button" data-act="next" aria-label="Foto berikutnya">&gt;</button>` : ""}
         <span class="slide-count" id="slideCount">1 / ${n}</span>
@@ -194,8 +222,9 @@ function render(d) {
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const url = input.value.trim();
+  const url = normalizeInput(input.value);
   if (!url) return setStatus("Tempel link TikTok dulu.", "err");
+  input.value = url;
 
   resultBox.hidden = true;
   statusBox.hidden = true;
@@ -209,7 +238,7 @@ form.addEventListener("submit", async (event) => {
   }, 200);
 
   try {
-    const res = await fetch(`/api/tiktok?url=${encodeURIComponent(url)}`);
+    const res = await fetch(`${API}/tiktok?url=${encodeURIComponent(url)}`);
     const json = await res.json().catch(() => null);
     clearInterval(ticker);
     if (!res.ok || !json?.success) throw new Error(json?.error?.message || "Gagal memproses URL");
@@ -301,3 +330,11 @@ pasteBtn.addEventListener("click", async () => {
     setStatus("Izinkan akses clipboard, atau tekan lama pada kolom lalu pilih Tempel.", "err");
   }
 });
+
+// Buka BASE_URL/?url=LINK : link terisi dan langsung diproses otomatis
+(() => {
+  const q = new URLSearchParams(location.search).get("url");
+  if (!q) return;
+  input.value = normalizeInput(q);
+  form.requestSubmit();
+})();

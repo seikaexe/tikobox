@@ -1,8 +1,8 @@
-import { Router } from "express";
+import { Router, type Response } from "express";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { downloadTikTok, providerReferer, providerUserAgent } from "../services/downloader.js";
-import { isAllowedMediaUrl, isTikTokUrl, safeFileName } from "../utils/validator.js";
+import { isAllowedMediaUrl, isTikTokUrl, normalizeTikTokInput, safeFileName } from "../utils/validator.js";
 import { rateLimit } from "../utils/rateLimit.js";
 
 const router = Router();
@@ -11,22 +11,29 @@ router.get("/health", (_req, res) => {
   res.json({ success: true, status: "ok" });
 });
 
-router.get("/tiktok", rateLimit(30, 60_000), async (req, res) => {
-  const url = req.query.url;
-  if (!isTikTokUrl(url)) {
-    res.status(400).json({ success: false, error: { message: "Link TikTok tidak valid." } });
+const lookupLimit = rateLimit(30, 60_000);
+
+async function lookup(input: unknown, res: Response) {
+  const url = normalizeTikTokInput(input);
+  if (!url || !isTikTokUrl(url)) {
+    res.status(400).json({
+      success: false,
+      error: { message: "Link TikTok tidak valid. Tempel link setelah /api/, contoh: /api/https://vt.tiktok.com/xxxx" }
+    });
     return;
   }
 
   try {
-    const data = await downloadTikTok(url.trim());
+    const data = await downloadTikTok(url);
     res.setHeader("cache-control", "no-store");
     res.json({ success: true, data });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Gagal memproses URL";
     res.status(502).json({ success: false, error: { message } });
   }
-});
+}
+
+router.get("/tiktok", lookupLimit, (req, res) => lookup(req.query.url, res));
 
 router.get("/download", rateLimit(60, 60_000), async (req, res) => {
   const url = req.query.url;
@@ -36,18 +43,19 @@ router.get("/download", rateLimit(60, 60_000), async (req, res) => {
   }
 
   const name = safeFileName(req.query.name);
+  const cookie = typeof req.query.c === "string" ? req.query.c.replace(/[\r\n]/g, "").slice(0, 2000) : "";
   const controller = new AbortController();
   res.on("close", () => controller.abort());
 
   try {
     const upstream = await fetch(url, {
-      headers: { "user-agent": providerUserAgent, referer: providerReferer },
+      headers: { "user-agent": providerUserAgent, referer: providerReferer, accept: "*/*", ...(cookie ? { cookie } : {}) },
       signal: controller.signal,
       redirect: "follow"
     });
 
     if (!upstream.ok || !upstream.body) {
-      res.status(502).json({ success: false, error: { message: "Gagal mengambil file dari provider." } });
+      res.status(502).json({ success: false, error: { message: `Gagal mengambil file dari provider (HTTP ${upstream.status}).` } });
       return;
     }
 
@@ -55,7 +63,8 @@ router.get("/download", rateLimit(60, 60_000), async (req, res) => {
     const length = upstream.headers.get("content-length");
     res.setHeader("content-type", type);
     if (length) res.setHeader("content-length", length);
-    res.setHeader("content-disposition", `attachment; filename="${name}"`);
+    const inline = req.query.inline === "1";
+    res.setHeader("content-disposition", `${inline ? "inline" : "attachment"}; filename="${name}"`);
     res.setHeader("cache-control", "no-store");
 
     await pipeline(Readable.fromWeb(upstream.body as any), res);
@@ -66,6 +75,29 @@ router.get("/download", rateLimit(60, 60_000), async (req, res) => {
       res.destroy();
     }
   }
+});
+
+// /api/  : info penggunaan, atau proses langsung kalau ada ?url=
+router.get("/", lookupLimit, (req, res) => {
+  if (req.query.url) return lookup(req.query.url, res);
+  res.json({
+    success: true,
+    name: "Tikobox API",
+    usage: {
+      format: "/api/ + link TikTok",
+      example: "/api/https://vt.tiktok.com/xxxx",
+      supported: ["tiktok.com", "vt.tiktok.com", "vm.tiktok.com", "tt.site", "www.tt.site"]
+    }
+  });
+});
+
+// /api/https://vt.tiktok.com/xxx : tempel link apa adanya setelah /api/
+router.get("/*splat", lookupLimit, (req, res) => {
+  let raw = req.originalUrl.replace(/^\/api\//, "");
+  try { raw = decodeURIComponent(raw); } catch {}
+  // sebagian proxy menyatukan "//" menjadi "/"
+  raw = raw.replace(/^(https?):\/(?!\/)/i, "$1://");
+  return lookup(raw, res);
 });
 
 export default router;

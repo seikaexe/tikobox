@@ -9,15 +9,36 @@ const TIKTOK_HOSTS = [
 ];
 
 const MEDIA_HOST_SUFFIXES = [
-  "tikwm.com",
   "tiktokcdn.com",
   "tiktokcdn-us.com",
   "tiktokv.com",
   "tiktokv.us",
   "byteoversea.com",
   "ibytedtos.com",
-  "muscdn.com"
+  "muscdn.com",
+  "tiktokcdn-eu.com",
+  "tiktokv.eu",
+  "tiktok.com"
 ];
+
+/*
+ * Ambil link TikTok / tt.site dari teks yang ditempel.
+ * Boleh tanpa https://, boleh ada caption di sekitarnya.
+ */
+export function normalizeTikTokInput(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+
+  const text = value.trim().slice(0, 1000);
+  const match =
+    text.match(/https?:\/\/[^\s"'<>]+/i) ??
+    text.match(/(?<![a-z0-9-])(?:[a-z0-9-]+\.)*(?:tiktok\.com|tt\.site)\/[^\s"'<>]*/i);
+
+  if (!match) return undefined;
+
+  let link = match[0].replace(/[.,;:!?)\]]+$/, "");
+  if (!/^https?:\/\//i.test(link)) link = "https://" + link;
+  return link;
+}
 
 export function isTikTokUrl(value: unknown): value is string {
   if (typeof value !== "string" || value.length > 500) return false;

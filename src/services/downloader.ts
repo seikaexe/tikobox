@@ -23,6 +23,7 @@ export type TikTokResult = {
   };
   audio?: string;
   images?: string[];
+  cookie?: string;
 };
 
 const UA =
@@ -31,6 +32,7 @@ const UA =
   "Chrome/124.0.0.0 Mobile Safari/537.36";
 
 const TIMEOUT = 30_000;
+
 
 const HEADERS: Record<string, string> = {
   "user-agent": UA,
@@ -68,7 +70,7 @@ export async function downloadTikTok(
     );
   }
 
-  const html =
+  const { html, cookie } =
     await fetchHtml(finalUrl);
 
   const data =
@@ -97,6 +99,14 @@ export async function downloadTikTok(
     );
   }
 
+  /*
+   * Cookie sesi dari TikTok sendiri, dipakai proxy
+   * saat mengunduh media (tanpa pihak ketiga)
+   */
+  if (cookie) {
+    result.cookie = cookie;
+  }
+
   return result;
 }
 
@@ -118,6 +128,31 @@ async function resolveTikTokUrl(
     input.trim();
 
   for (let i = 0; i < 10; i++) {
+    /*
+     * URL video/foto lengkap (termasuk tt.site/@user/video/123)
+     * tidak perlu dibuka lagi
+     */
+    const direct =
+      directTikTokUrl(
+        current
+      );
+
+    if (direct) {
+      return direct;
+    }
+
+    /*
+     * Hanya ikuti redirect di host TikTok / tt.site
+     */
+    if (
+      !isTikTokHost(current) &&
+      !isShortlinkHost(current)
+    ) {
+      throw new Error(
+        "Link tidak mengarah ke halaman TikTok"
+      );
+    }
+
     const controller =
       new AbortController();
 
@@ -243,6 +278,37 @@ async function resolveTikTokUrl(
   throw new Error(
     "Terlalu banyak redirect saat membuka link TikTok"
   );
+}
+
+/*
+ * Kalau URL sudah berbentuk /@user/video/ID (atau /photo/ID)
+ * di host TikTok atau tt.site, langsung ubah ke www.tiktok.com
+ */
+function directTikTokUrl(
+  input: string
+): string | undefined {
+  try {
+    const u = new URL(input);
+
+    if (
+      !isTikTokHost(input) &&
+      !isShortlinkHost(input)
+    ) {
+      return undefined;
+    }
+
+    const match =
+      u.pathname.match(
+        /^\/@[^/]+\/(?:video|photo)\/\d+/
+      );
+
+    return match
+      ? "https://www.tiktok.com" +
+          match[0]
+      : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 /*
@@ -436,7 +502,7 @@ function extractRedirectUrl(
  */
 async function fetchHtml(
   url: string
-): Promise<string> {
+): Promise<{ html: string; cookie: string }> {
   const controller =
     new AbortController();
 
@@ -470,7 +536,16 @@ async function fetchHtml(
       );
     }
 
-    return await response.text();
+    const cookie =
+      (response.headers.getSetCookie?.() ?? [])
+        .map((c) => c.split(";")[0])
+        .join("; ")
+        .slice(0, 1500);
+
+    return {
+      html: await response.text(),
+      cookie
+    };
 
   } catch (error) {
     if (
@@ -1182,11 +1257,6 @@ function cleanUrl(
 
   url =
     htmlDecode(
-      url
-    );
-
-  url =
-    decodeURIComponentSafe(
       url
     );
 

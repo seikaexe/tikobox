@@ -3,6 +3,9 @@ const copyBtn = document.getElementById("copyBase");
 
 if (baseEl) baseEl.textContent = location.origin;
 
+const apiEl = document.getElementById("apiUrl");
+if (apiEl) apiEl.textContent = `${location.origin}/api/`;
+
 copyBtn?.addEventListener("click", async () => {
   const text = baseEl.textContent.trim();
   try {
