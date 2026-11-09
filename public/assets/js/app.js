@@ -123,24 +123,23 @@ function triggerDownload(blob, name) {
 }
 
 // Android dan desktop: file langsung terunduh. iPhone: menu share, pilih Simpan Video.
-async function saveMedia(url, name, mime, { gallery = true, size = 0, from = 0, label = "Mengunduh video" } = {}) {
-  const blob = await getBlob(url, name, { size, from, label });
-  const file = new File([blob], name, { type: blob.type || mime });
+function directDownload(url, name) {
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  a.target = "_blank";
+  a.rel = "noopener";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
 
-  if (gallery && isIOS && navigator.canShare?.({ files: [file] })) {
-    try {
-      await navigator.share({ files: [file] });
-      setStatus("Pilih Simpan Video untuk memasukkannya ke galeri.", "ok");
-    } catch (e) {
-      if (e.name === "AbortError") return setStatus("Penyimpanan dibatalkan.");
-      if (e.name === "NotAllowedError") return setStatus("File sudah siap, tekan tombol simpan sekali lagi.", "ok");
-      throw e;
-    }
-    return;
-  }
-
-  triggerDownload(blob, name);
-  setStatus(gallery ? "Selesai, cek galeri atau folder unduhan kamu." : "Selesai, file sudah diunduh.", "ok");
+// Download langsung dari URL media provider ke browser/device.
+// Server Tikobox tidak menerima atau meneruskan stream video.
+async function saveMedia(url, name, mime, { label = "Mengunduh" } = {}) {
+  setProgress(100, label + " langsung ke perangkat");
+  directDownload(url, name);
+  setStatus("Download dimulai langsung dari provider. Jika browser membuka video di tab baru, gunakan menu download pada browser.", "ok");
 }
 
 function fileBase(d) {
@@ -278,31 +277,15 @@ resultBox.addEventListener("click", async (event) => {
     } else if (act === "allphotos" && current?.images) {
       const base = fileBase(current);
       const list = current.images;
-      const blobs = [];
 
       for (let i = 0; i < list.length; i++) {
         const n = `${base}-${i + 1}.jpg`;
-        const from = (i / list.length) * 100;
-        const b = await getBlob(list[i], n, { from, label: `Foto ${i + 1} dari ${list.length}` });
-        blobs.push({ blob: b, name: n });
-        setProgress(((i + 1) / list.length) * 100);
+        setProgress(((i + 1) / list.length) * 100, `Mengunduh foto ${i + 1} dari ${list.length}`);
+        directDownload(list[i], n);
+        await new Promise((r) => setTimeout(r, 250));
       }
 
-      const files = blobs.map((x) => new File([x.blob], x.name, { type: x.blob.type || "image/jpeg" }));
-      if (isIOS && navigator.canShare?.({ files })) {
-        try {
-          await navigator.share({ files });
-          setStatus("Pilih Simpan Gambar untuk memasukkannya ke galeri.", "ok");
-        } catch (e) {
-          if (e.name !== "AbortError") throw e;
-        }
-      } else {
-        for (const x of blobs) {
-          triggerDownload(x.blob, x.name);
-          await new Promise((r) => setTimeout(r, 300));
-        }
-        setStatus("Selesai, foto sudah diunduh.", "ok");
-      }
+      setStatus("Download semua foto dimulai langsung dari provider.", "ok");
     }
   } catch (error) {
     progressBox.hidden = true;
