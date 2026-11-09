@@ -21,10 +21,9 @@ npm install
 npm run dev
 ```
 
-Production:
+Server biasa (non-Vercel):
 
 ```bash
-npm run build
 npm start
 ```
 
@@ -32,13 +31,19 @@ Port default 3000. Ubah lewat environment variable `PORT` bila perlu. Project in
 
 Gunakan downloader hanya untuk konten yang kamu berhak unduh dan sesuai kebijakan platform serta hukum yang berlaku.
 
-
 ## Deploy Vercel
 
-Project ini sudah memiliki `api/index.ts` dan `vercel.json` untuk deployment Vercel.
+Tidak perlu build command dan tidak perlu environment variable.
 
-- Frontend: file statis di `public/`
-- API: `/api/*`
-- Health check: `/api/health`
-- TikTok API: `/api/tiktok?url=...`
-- Media proxy: `/api/download?url=...&name=...`
+1. Push project ke GitHub, lalu import di Vercel. Framework terdeteksi otomatis sebagai Express.
+2. Biarkan Build Command, Output Directory, dan Install Command kosong (default).
+3. Deploy.
+
+Cara kerjanya:
+
+- `src/server.ts` mengekspor app Express sebagai default export, dan Vercel menjalankannya sebagai satu function
+- `public/` dilayani CDN Vercel, jadi `/` dan semua file di `/assets` tidak melewati function
+- `vercel.json` hanya mengarahkan `/docs` ke `docs.html`
+- Jalur `/api/*` ditangani Express (`/api/tiktok`, `/api/download`, `/api/health`)
+
+Untuk cek tipe sebelum deploy, jalankan `npm run typecheck`.

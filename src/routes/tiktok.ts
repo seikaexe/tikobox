@@ -5,40 +5,38 @@ import { downloadTikTok, providerUserAgent, providerReferer } from "../services/
 
 export const tiktokRouter = Router();
 
-tiktokRouter.get("/tiktok", async (req: Request, res: Response) => {
+function fail(res: Response, status: number, code: string, message: string): void {
+  res.status(status).json({ success: false, error: { code, message } });
+}
+
+tiktokRouter.get("/tiktok", async (req: Request, res: Response): Promise<void> => {
   const url = String(req.query.url || "").trim();
 
   if (!url || !isTikTokUrl(url)) {
-    return res.status(400).json({
-      success: false,
-      error: { code: "INVALID_URL", message: "URL TikTok tidak valid" }
-    });
+    fail(res, 400, "INVALID_URL", "URL TikTok tidak valid");
+    return;
   }
 
   try {
     const data = await downloadTikTok(url);
-    return res.json({ success: true, data });
+    res.json({ success: true, data });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Downloader provider error";
-    return res.status(502).json({
-      success: false,
-      error: { code: "DOWNLOAD_PROVIDER_ERROR", message }
-    });
+    fail(res, 502, "DOWNLOAD_PROVIDER_ERROR", message);
   }
 });
 
 // Proxy file media supaya browser langsung menyimpan file (tanpa membuka tab baru).
-tiktokRouter.get("/download", async (req: Request, res: Response) => {
+tiktokRouter.get("/download", async (req: Request, res: Response): Promise<void> => {
   const target = String(req.query.url || "");
-  const name = String(req.query.name || "tikobox.mp4")
-    .replace(/[^a-zA-Z0-9._-]/g, "_")
-    .slice(0, 80) || "tikobox.mp4";
+  const name =
+    String(req.query.name || "tikobox.mp4")
+      .replace(/[^a-zA-Z0-9._-]/g, "_")
+      .slice(0, 80) || "tikobox.mp4";
 
   if (!isAllowedMediaUrl(target)) {
-    return res.status(400).json({
-      success: false,
-      error: { code: "INVALID_MEDIA_URL", message: "URL media tidak diizinkan" }
-    });
+    fail(res, 400, "INVALID_MEDIA_URL", "URL media tidak diizinkan");
+    return;
   }
 
   try {
@@ -48,15 +46,15 @@ tiktokRouter.get("/download", async (req: Request, res: Response) => {
     });
 
     if (!upstream.ok || !upstream.body || !isAllowedMediaUrl(upstream.url)) {
-      return res.status(502).json({
-        success: false,
-        error: { code: "MEDIA_FETCH_FAILED", message: "Gagal mengambil file media" }
-      });
+      fail(res, 502, "MEDIA_FETCH_FAILED", "Gagal mengambil file media");
+      return;
     }
 
     const type = upstream.headers.get("content-type") || guessType(name);
     // content-length hanya valid bila body tidak dikompres
-    const length = upstream.headers.get("content-encoding") ? null : upstream.headers.get("content-length");
+    const length = upstream.headers.get("content-encoding")
+      ? null
+      : upstream.headers.get("content-length");
 
     res.setHeader("Content-Type", type);
     if (length) res.setHeader("Content-Length", length);
@@ -69,10 +67,9 @@ tiktokRouter.get("/download", async (req: Request, res: Response) => {
     stream.pipe(res);
   } catch {
     if (!res.headersSent) {
-      res.status(502).json({
-        success: false,
-        error: { code: "MEDIA_FETCH_FAILED", message: "Gagal mengambil file media" }
-      });
+      fail(res, 502, "MEDIA_FETCH_FAILED", "Gagal mengambil file media");
+    } else {
+      res.destroy();
     }
   }
 });

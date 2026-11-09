@@ -12,7 +12,7 @@ export function rateLimit() {
     for (const [key, b] of buckets) if (b.resetAt <= now) buckets.delete(key);
   }, windowMs).unref();
 
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     const key = req.ip || "unknown";
     const now = Date.now();
     let bucket = buckets.get(key);
@@ -25,10 +25,11 @@ export function rateLimit() {
     bucket.count++;
     if (bucket.count > max) {
       res.setHeader("Retry-After", Math.ceil((bucket.resetAt - now) / 1000));
-      return res.status(429).json({
+      res.status(429).json({
         success: false,
         error: { code: "RATE_LIMITED", message: "Terlalu banyak permintaan, coba lagi sebentar" }
       });
+      return;
     }
     next();
   };

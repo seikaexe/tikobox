@@ -1,4 +1,4 @@
-<!doctype html>
+export const NOT_FOUND_HTML = `<!doctype html>
 <html lang="id">
 <head>
   <meta charset="utf-8">
@@ -18,3 +18,4 @@
 </main>
 </body>
 </html>
+`;

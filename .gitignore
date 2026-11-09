@@ -1,4 +1,4 @@
 node_modules/
-dist/
+.vercel/
 npm-debug.log*
 .DS_Store
