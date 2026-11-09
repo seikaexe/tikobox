@@ -58,7 +58,9 @@ router.get("/download", rateLimit(60, 60_000), async (req, res) => {
       return;
     }
 
-    const type = upstream.headers.get("content-type") || "application/octet-stream";
+    let type = upstream.headers.get("content-type") || "application/octet-stream";
+    // Nama .mp3 harus bertipe audio, bukan video/mp4, supaya tidak jadi .mp3.mp4
+    if (/\.mp3$/i.test(name)) type = "audio/mpeg";
     const length = upstream.headers.get("content-length");
     res.setHeader("content-type", type);
     if (length) res.setHeader("content-length", length);

@@ -140,7 +140,9 @@ function triggerDownload(blob, name) {
 
 // Android dan desktop: file langsung terunduh. iPhone: menu share, pilih Simpan Video.
 async function saveMedia(url, name, mime, { gallery = true, size = 0, from = 0, label = "Mengunduh video" } = {}) {
-  const blob = await getBlob(url, name, { size, from, label });
+  const raw = await getBlob(url, name, { size, from, label });
+  // Audio: paksa tipe audio/mpeg supaya browser tidak menambah ekstensi .mp4 di belakang .mp3
+  const blob = gallery ? raw : new Blob([raw], { type: mime });
   const file = new File([blob], name, { type: blob.type || mime });
 
   if (gallery && isIOS && navigator.canShare?.({ files: [file] })) {
