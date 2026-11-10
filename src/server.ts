@@ -53,7 +53,7 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
 
   if (!clientError) console.error(err);
   if (res.headersSent) return;
-  res.status(clientError ? status : 500).json(fail(clientError ? "Permintaan tidak valid." : "Terjadi kesalahan pada server."));
+  res.status(clientError ? status : 500).json(fail(clientError ? "Permintaan tidak valid" : "Terjadi kesalahan pada server"));
 });
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
