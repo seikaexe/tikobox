@@ -514,24 +514,25 @@ async function fetchHtml(
     );
 
   try {
-    const response =
-      await fetch(
-        url,
-        {
-          headers:
-            HEADERS,
+    let current = url;
+    let response: Response | undefined;
+    for (let hop = 0; hop <= 4; hop++) {
+      if (!isTikTokHost(current) && !isShortlinkHost(current)) {
+        throw new Error("Redirect TikTok tidak diizinkan");
+      }
+      response = await fetch(current, {
+        headers: HEADERS,
+        redirect: "manual",
+        signal: controller.signal
+      });
+      const location = response.headers.get("location");
+      if (![301, 302, 303, 307, 308].includes(response.status)) break;
+      if (!location || hop === 4) throw new Error("Terlalu banyak redirect TikTok");
+      current = new URL(location, current).href;
+      try { await response.body?.cancel(); } catch {}
+    }
 
-          redirect:
-            "follow",
-
-          signal:
-            controller.signal
-        }
-      );
-
-    if (
-      !response.ok
-    ) {
+    if (!response || !response.ok) {
       throw new Error(
         `TikTok returned HTTP ${response.status}`
       );

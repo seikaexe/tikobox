@@ -50,7 +50,7 @@ function adapt(d) {
     video: slides ? undefined : { hd, sd: d.play || d.hdplay, hdSize: d.hd_size, sdSize: d.size },
     audio: d.music,
     images: slides ? d.images : undefined,
-    cookie: d.cookie
+    mediaToken: d.media_token
   };
 }
 
@@ -61,8 +61,8 @@ function esc(value) {
 }
 
 function proxyUrl(url, name) {
-  const c = current?.cookie ? `&c=${encodeURIComponent(current.cookie)}` : "";
-  return `${API}/download?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name)}${c}`;
+  const token = current?.mediaToken ? `&t=${encodeURIComponent(current.mediaToken)}` : "";
+  return `${API}/download?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name)}${token}`;
 }
 
 // Gambar lewat proxy supaya tidak diblokir hotlink/referrer TikTok
@@ -232,7 +232,7 @@ function render(d) {
       <h2>${esc(d.title || "TikTok Video")}</h2>
       <p class="meta">${esc(author)}</p>
       <div class="actions">${actions}</div>
-      <p class="hint">${isIOS ? "Di iPhone, pilih Simpan Video pada menu yang muncul." : "Tekan tombol download, file akan muncul di galeri."}</p>
+      <p class="hint">${isIOS ? "Di iPhone, pilih Simpan Video pada menu yang muncul." : "Tekan tombol download, file akan muncul di galeri"}</p>
     </div>`;
   resultBox.hidden = false;
   if (isSlides) bindSwipe();

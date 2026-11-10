@@ -7,8 +7,7 @@ export function rateLimit(max: number, windowMs: number) {
 
   return (req: Request, res: Response, next: NextFunction) => {
     const now = Date.now();
-    const fwd = req.headers["x-forwarded-for"];
-    const ip = (Array.isArray(fwd) ? fwd[0] : fwd?.split(",")[0])?.trim() || req.socket.remoteAddress || "unknown";
+    const ip = req.ip || req.socket.remoteAddress || "unknown";
 
     if (buckets.size > 5000) {
       for (const [k, b] of buckets) if (b.reset <= now) buckets.delete(k);

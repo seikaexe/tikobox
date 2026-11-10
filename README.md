@@ -80,3 +80,11 @@ Cara kerjanya:
 - `express.static` hanya berlaku saat dijalankan lokal, di Vercel diabaikan
 
 Untuk cek tipe sebelum deploy, jalankan `npm run typecheck`.
+
+## Security configuration
+
+Set `MEDIA_TOKEN_SECRET` in your deployment environment to a random secret of at least 32 characters. It encrypts short-lived media cookies so raw TikTok cookies are never returned to the browser. Example generation command: `openssl rand -base64 48`.
+
+Build the frontend asset with `npm install` followed by `npm run build:frontend`; this uses Terser to produce `public/assets/js/app.min.js`. The source `app.js` is not referenced by the page. Minification is only a readability deterrent, not a way to hide browser-delivered code.
+
+The media proxy only accepts HTTPS media hosts on the allowlist, validates DNS results and every redirect, and caps streamed downloads at 100 MB. The in-memory rate limiter is per-instance; use a shared Redis/Valkey-backed limiter for high-traffic or multi-instance deployments.

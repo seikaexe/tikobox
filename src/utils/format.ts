@@ -1,4 +1,5 @@
 import type { TikTokResult } from "../services/downloader.js";
+import { createMediaToken } from "./mediaToken.js";
 
 /*
  * Bentuk response API (mirip tikwm):
@@ -13,6 +14,7 @@ export function toApiData(r: TikTokResult) {
   const wmplay = v.wm ?? play;
   const m = r.music;
   const st = r.stats ?? {};
+  const mediaToken = createMediaToken(r.cookie);
 
   return {
     id: r.id ?? "",
@@ -52,7 +54,7 @@ export function toApiData(r: TikTokResult) {
       avatar: r.author?.avatar ?? ""
     },
     ...(r.images?.length ? { images: r.images } : {}),
-    ...(r.cookie ? { cookie: r.cookie } : {})
+    ...(mediaToken ? { media_token: mediaToken } : {})
   };
 }
 
