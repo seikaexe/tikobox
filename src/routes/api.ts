@@ -92,11 +92,11 @@ async function hashtagLookup(input: unknown, req: Request, res: Response) {
 }
 
 const q = (v: unknown) => (Array.isArray(v) ? v[0] : v);
-router.get("/user", lookupGuards, (req, res) => profileLookup(q(req.query.unique_id ?? req.query.username), req, res));
-router.get("/user/:username", lookupGuards, (req, res) => profileLookup(req.params.username, req, res));
-router.get("/hashtag", lookupGuards, (req, res) => hashtagLookup(q(req.query.name ?? req.query.hashtag), req, res));
-router.get("/hashtag/:name", lookupGuards, (req, res) => hashtagLookup(req.params.name, req, res));
-router.get(/^\/@([^/]+)$/, lookupGuards, (req, res) => profileLookup(req.params[0], req, res));
+router.get("/user", lookupGuards, (req: Request, res: Response) => profileLookup(q(req.query.unique_id ?? req.query.username), req, res));
+router.get("/user/:username", lookupGuards, (req: Request, res: Response) => profileLookup(req.params.username, req, res));
+router.get("/hashtag", lookupGuards, (req: Request, res: Response) => hashtagLookup(q(req.query.name ?? req.query.hashtag), req, res));
+router.get("/hashtag/:name", lookupGuards, (req: Request, res: Response) => hashtagLookup(req.params.name, req, res));
+router.get(/^\/@([^/]+)$/, lookupGuards, (req: Request, res: Response) => profileLookup(req.params[0], req, res));
 
 router.get("/download", rateLimit({ name: "download", max: 60, windowMs: 60_000, suspiciousMax: 15 }), async (req, res) => {
   // Proxy ini hanya untuk halaman Tikobox sendiri; blokir hotlink dari situs lain.
