@@ -22,6 +22,19 @@ let current = null;
 let progressNow = 0;
 let slideIndex = 0;
 
+// Monetag Onclick: muat tag saat tombol download video ditekan.
+// Tag hanya dimuat sekali agar tidak menambahkan script berulang.
+let monetagOnclickLoaded = false;
+function loadMonetagOnclick() {
+  if (monetagOnclickLoaded) return;
+  monetagOnclickLoaded = true;
+  const script = document.createElement("script");
+  script.dataset.zone = "12232293";
+  script.src = "https://al5sm.com/tag.min.js";
+  script.async = true;
+  (document.body || document.documentElement).appendChild(script);
+}
+
 function setStatus(message, type = "") {
   statusBox.hidden = false;
   statusBox.className = "status" + (type ? " " + type : "");
@@ -297,6 +310,7 @@ resultBox.addEventListener("click", async (event) => {
 
   try {
     if (act === "video") {
+      loadMonetagOnclick();
       await saveMedia(url, name, "video/mp4", { size, label: "Mengunduh video" });
     } else if (act === "audio") {
       await saveMedia(url, name, "audio/mpeg", { gallery: false, label: "Mengunduh audio" });
