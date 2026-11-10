@@ -22,8 +22,8 @@ let current = null;
 let progressNow = 0;
 let slideIndex = 0;
 
-// Monetag Onclick: muat tag saat tombol download video ditekan.
-// Tag hanya dimuat sekali agar tidak menambahkan script berulang.
+// Monetag Onclick: muat setelah hasil video tampil, sebelum pengunjung menekan tombol download.
+// Jika dimuat di dalam handler klik download, script terlambat menangkap klik pertama.
 let monetagOnclickLoaded = false;
 function loadMonetagOnclick() {
   if (monetagOnclickLoaded) return;
@@ -254,6 +254,7 @@ function render(d) {
       <p class="hint">${isIOS ? "Di iPhone, pilih Simpan Video pada menu yang muncul." : "Tekan tombol download, file akan muncul di galeri"}</p>
     </div>`;
   resultBox.hidden = false;
+  if (best) loadMonetagOnclick();
   if (isSlides) bindSwipe();
 }
 
@@ -310,7 +311,6 @@ resultBox.addEventListener("click", async (event) => {
 
   try {
     if (act === "video") {
-      loadMonetagOnclick();
       await saveMedia(url, name, "video/mp4", { size, label: "Mengunduh video" });
     } else if (act === "audio") {
       await saveMedia(url, name, "audio/mpeg", { gallery: false, label: "Mengunduh audio" });

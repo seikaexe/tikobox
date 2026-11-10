@@ -11,7 +11,8 @@ const GOOGLE_ADS_SCRIPT = [
   "https://www.googletagservices.com",
   "https://partner.googleadservices.com",
   "https://www.google.com",
-  "https://*.adtrafficquality.google"
+  "https://*.adtrafficquality.google",
+  "https://al5sm.com"
 ];
 
 const TIKTOK_MEDIA = [
