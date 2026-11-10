@@ -1,10 +1,15 @@
 import express, { type NextFunction, type Request, type RequestHandler, type Response } from "express";
-import helmet from "helmet";
+import * as helmetPkg from "helmet";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import apiRouter from "./routes/api.js";
 import { cspDirectives } from "./utils/csp.js";
 import { fail } from "./utils/format.js";
+
+// Typing helmet berbeda antara CJS/ESM (NodeNext) dan membuat `import helmet from` gagal
+// di tsc (TS2349). Ambil fungsinya secara defensif supaya aman di kedua kasus.
+const helmetMod: any = helmetPkg;
+const helmet: (options?: object) => RequestHandler = helmetMod.default?.default ?? helmetMod.default ?? helmetMod;
 
 const app = express();
 app.disable("x-powered-by");
