@@ -18,21 +18,68 @@ const isIOS =
 const API = `${location.origin}/api`;
 
 const blobCache = new Map();
+const inflight = new Map();
 let current = null;
 let progressNow = 0;
 let slideIndex = 0;
 
-// Monetag Onclick: muat setelah hasil video tampil, sebelum pengunjung menekan tombol download.
-// Jika dimuat di dalam handler klik download, script terlambat menangkap klik pertama.
-let monetagOnclickLoaded = false;
-function loadMonetagOnclick() {
-  if (monetagOnclickLoaded) return;
-  monetagOnclickLoaded = true;
-  const script = document.createElement("script");
-  script.dataset.zone = "12232293";
-  script.src = "https://al5sm.com/tag.min.js";
-  script.async = true;
-  (document.body || document.documentElement).appendChild(script);
+// Iklan (zone 12232476): dimuat sekali setelah hasil video tampil, jadi sudah siap
+// sebelum pengunjung menekan tombol download.
+const AD_ZONE = "12232476";
+const AD_SRC = "https://al5sm.com/tag.min.js";
+const AD_SECONDS = 5; // lama tombol "Lanjut download" terkunci
+let adLoaded = false;
+function loadAdScript() {
+  if (adLoaded) return;
+  adLoaded = true;
+  const s = document.createElement("script");
+  s.dataset.zone = AD_ZONE;
+  s.src = AD_SRC;
+  [document.documentElement, document.body].filter(Boolean).pop().appendChild(s);
+}
+
+// Gate iklan: popup wajib tunggu beberapa detik sebelum download video.
+// Resolve true kalau pengunjung menekan "Lanjut download", false kalau ditutup.
+function showAdGate(seconds = AD_SECONDS) {
+  loadAdScript();
+  return new Promise((resolve) => {
+    const gate = document.createElement("div");
+    gate.className = "ad-gate";
+    gate.setAttribute("role", "dialog");
+    gate.setAttribute("aria-modal", "true");
+    gate.innerHTML = `
+      <div class="ad-box">
+        <div class="ad-head"><span>IKLAN</span><button type="button" class="ad-close" aria-label="Tutup">X</button></div>
+        <div class="ad-slot"><p class="ad-note">Tonton iklan sebentar untuk lanjut download. Video sedang disiapkan di latar belakang.</p></div>
+        <button type="button" class="btn btn-primary ad-go" disabled></button>
+      </div>`;
+    document.body.appendChild(gate);
+    document.body.classList.add("ad-open");
+
+    const go = gate.querySelector(".ad-go");
+    const close = gate.querySelector(".ad-close");
+    let left = seconds;
+    const label = () => (go.textContent = left > 0 ? `TUNGGU ${left} DETIK` : "LANJUT DOWNLOAD");
+    label();
+
+    const timer = setInterval(() => {
+      left -= 1;
+      label();
+      if (left <= 0) {
+        clearInterval(timer);
+        go.disabled = false;
+      }
+    }, 1000);
+
+    const finish = (ok) => {
+      clearInterval(timer);
+      gate.remove();
+      document.body.classList.remove("ad-open");
+      resolve(ok);
+    };
+    go.addEventListener("click", () => !go.disabled && finish(true));
+    close.addEventListener("click", () => finish(false));
+  });
 }
 
 function setStatus(message, type = "") {
@@ -106,7 +153,14 @@ function normalizeInput(raw) {
 }
 
 // Unduh file lewat proxy sambil menghitung persen. Rentang persen: from sampai 100.
-async function getBlob(url, name, { size = 0, from = 0, label = "Mengunduh" } = {}) {
+function getBlob(url, name, opts = {}) {
+  if (inflight.has(url)) return inflight.get(url);
+  const p = fetchBlob(url, name, opts).finally(() => inflight.delete(url));
+  inflight.set(url, p);
+  return p;
+}
+
+async function fetchBlob(url, name, { size = 0, from = 0, label = "Mengunduh" } = {}) {
   if (blobCache.has(url)) {
     setProgress(100, label);
     return blobCache.get(url);
@@ -177,7 +231,7 @@ async function saveMedia(url, name, mime, { gallery = true, size = 0, from = 0, 
   }
 
   triggerDownload(blob, name);
-  setStatus(gallery ? "Selesai, cek galeri atau folder unduhan kamu." : "Selesai, file sudah diunduh.", "ok");
+  setStatus(gallery ? "Selesai, cek galeri atau folder unduhan kamu" : "Selesai, file sudah diunduh.", "ok");
 }
 
 function fileBase(d) {
@@ -217,11 +271,11 @@ function render(d) {
   let actions = "";
 
   if (best) {
-    actions += `<button class="btn btn-primary" data-act="video" data-size="${bestSize || 0}" data-url="${esc(best)}" data-name="${base}.mp4">
+    actions += `<button class="btn btn-primary has-ad" data-act="video" data-size="${bestSize || 0}" data-url="${esc(best)}" data-name="${base}.mp4">
       ${isIOS ? "SIMPAN KE GALERI" : "DOWNLOAD VIDEO"}${d.video.hd ? " HD" : ""}</button>`;
     const row = [];
     if (d.video.hd && d.video.sd)
-      row.push(`<button class="btn btn-blue btn-sm" data-act="video" data-size="${d.video.sdSize || 0}" data-url="${esc(d.video.sd)}" data-name="${base}-sd.mp4">VIDEO SD</button>`);
+      row.push(`<button class="btn btn-blue btn-sm has-ad" data-act="video" data-size="${d.video.sdSize || 0}" data-url="${esc(d.video.sd)}" data-name="${base}-sd.mp4">VIDEO SD</button>`);
     if (d.audio)
       row.push(`<button class="btn btn-pink btn-sm" data-act="audio" data-url="${esc(d.audio)}" data-name="${base}.mp3">MP3</button>`);
     if (row.length) actions += `<div class="row">${row.join("")}</div>`;
@@ -251,17 +305,17 @@ function render(d) {
       <h2>${esc(d.title || "TikTok Video")}</h2>
       <p class="meta">${esc(author)}</p>
       <div class="actions">${actions}</div>
-      <p class="hint">${isIOS ? "Di iPhone, pilih Simpan Video pada menu yang muncul." : "Tekan tombol download, file akan muncul di galeri"}</p>
+      <p class="hint">${isIOS ? "Di iPhone, pilih Simpan Video pada menu yang muncul." : "Tekan tombol download, tonton iklan sebentar, lalu file muncul di galeri"}</p>
     </div>`;
   resultBox.hidden = false;
-  if (best) loadMonetagOnclick();
+  if (best) loadAdScript();
   if (isSlides) bindSwipe();
 }
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   const url = normalizeInput(input.value);
-  if (!url) return setStatus("Tempel link TikTok dulu.", "err");
+  if (!url) return setStatus("Tempel link TikTok dulu", "err");
   input.value = url;
 
   resultBox.hidden = true;
@@ -294,8 +348,6 @@ form.addEventListener("submit", async (event) => {
   }
 });
 
-// Download langsung tanpa interstitial AdSense.
-
 resultBox.addEventListener("click", async (event) => {
   const btn = event.target.closest("button[data-act]");
   if (!btn) return;
@@ -311,6 +363,10 @@ resultBox.addEventListener("click", async (event) => {
 
   try {
     if (act === "video") {
+      // Siapkan file selama iklan tampil, lalu simpan setelah pengunjung lanjut
+      getBlob(url, name, { size, label: "Mengunduh video" }).catch(() => {});
+      const ok = await showAdGate();
+      if (!ok) { progressBox.hidden = true; return; }
       await saveMedia(url, name, "video/mp4", { size, label: "Mengunduh video" });
     } else if (act === "audio") {
       await saveMedia(url, name, "audio/mpeg", { gallery: false, label: "Mengunduh audio" });
@@ -369,7 +425,7 @@ pasteBtn.addEventListener("click", async () => {
     input.focus();
   } catch {
     input.focus();
-    setStatus("Izinkan akses clipboard, atau tekan lama pada kolom lalu pilih Tempel.", "err");
+    setStatus("Izinkan akses clipboard, atau tekan lama pada kolom lalu pilih Tempel", "err");
   }
 });
 
