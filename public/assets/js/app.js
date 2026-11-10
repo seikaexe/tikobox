@@ -23,65 +23,6 @@ let current = null;
 let progressNow = 0;
 let slideIndex = 0;
 
-// Iklan (zone 12232476): dimuat sekali setelah hasil video tampil, jadi sudah siap
-// sebelum pengunjung menekan tombol download.
-const AD_ZONE = "12232476";
-const AD_SRC = "https://al5sm.com/tag.min.js";
-const AD_SECONDS = 5; // lama tombol "Lanjut download" terkunci
-let adLoaded = false;
-function loadAdScript() {
-  if (adLoaded) return;
-  adLoaded = true;
-  const s = document.createElement("script");
-  s.dataset.zone = AD_ZONE;
-  s.src = AD_SRC;
-  [document.documentElement, document.body].filter(Boolean).pop().appendChild(s);
-}
-
-// Gate iklan: popup wajib tunggu beberapa detik sebelum download video.
-// Resolve true kalau pengunjung menekan "Lanjut download", false kalau ditutup.
-function showAdGate(seconds = AD_SECONDS) {
-  loadAdScript();
-  return new Promise((resolve) => {
-    const gate = document.createElement("div");
-    gate.className = "ad-gate";
-    gate.setAttribute("role", "dialog");
-    gate.setAttribute("aria-modal", "true");
-    gate.innerHTML = `
-      <div class="ad-box">
-        <div class="ad-head"><span>IKLAN</span><button type="button" class="ad-close" aria-label="Tutup">X</button></div>
-        <div class="ad-slot"><p class="ad-note">Tonton iklan sebentar untuk lanjut download. Video sedang disiapkan di latar belakang.</p></div>
-        <button type="button" class="btn btn-primary ad-go" disabled></button>
-      </div>`;
-    document.body.appendChild(gate);
-    document.body.classList.add("ad-open");
-
-    const go = gate.querySelector(".ad-go");
-    const close = gate.querySelector(".ad-close");
-    let left = seconds;
-    const label = () => (go.textContent = left > 0 ? `TUNGGU ${left} DETIK` : "LANJUT DOWNLOAD");
-    label();
-
-    const timer = setInterval(() => {
-      left -= 1;
-      label();
-      if (left <= 0) {
-        clearInterval(timer);
-        go.disabled = false;
-      }
-    }, 1000);
-
-    const finish = (ok) => {
-      clearInterval(timer);
-      gate.remove();
-      document.body.classList.remove("ad-open");
-      resolve(ok);
-    };
-    go.addEventListener("click", () => !go.disabled && finish(true));
-    close.addEventListener("click", () => finish(false));
-  });
-}
-
 function setStatus(message, type = "") {
   statusBox.hidden = false;
   statusBox.className = "status" + (type ? " " + type : "");
@@ -271,11 +212,11 @@ function render(d) {
   let actions = "";
 
   if (best) {
-    actions += `<button class="btn btn-primary has-ad" data-act="video" data-size="${bestSize || 0}" data-url="${esc(best)}" data-name="${base}.mp4">
+    actions += `<button class="btn btn-primary" data-act="video" data-size="${bestSize || 0}" data-url="${esc(best)}" data-name="${base}.mp4">
       ${isIOS ? "SIMPAN KE GALERI" : "DOWNLOAD VIDEO"}${d.video.hd ? " HD" : ""}</button>`;
     const row = [];
     if (d.video.hd && d.video.sd)
-      row.push(`<button class="btn btn-blue btn-sm has-ad" data-act="video" data-size="${d.video.sdSize || 0}" data-url="${esc(d.video.sd)}" data-name="${base}-sd.mp4">VIDEO SD</button>`);
+      row.push(`<button class="btn btn-blue btn-sm" data-act="video" data-size="${d.video.sdSize || 0}" data-url="${esc(d.video.sd)}" data-name="${base}-sd.mp4">VIDEO SD</button>`);
     if (d.audio)
       row.push(`<button class="btn btn-pink btn-sm" data-act="audio" data-url="${esc(d.audio)}" data-name="${base}.mp3">MP3</button>`);
     if (row.length) actions += `<div class="row">${row.join("")}</div>`;
@@ -305,10 +246,9 @@ function render(d) {
       <h2>${esc(d.title || "TikTok Video")}</h2>
       <p class="meta">${esc(author)}</p>
       <div class="actions">${actions}</div>
-      <p class="hint">${isIOS ? "Di iPhone, pilih Simpan Video pada menu yang muncul." : "Tekan tombol download, tonton iklan sebentar, lalu file muncul di galeri"}</p>
+      <p class="hint">${isIOS ? "Di iPhone, pilih Simpan Video pada menu yang muncul." : "Tekan tombol download, lalu file muncul di galeri"}</p>
     </div>`;
   resultBox.hidden = false;
-  if (best) loadAdScript();
   if (isSlides) bindSwipe();
 }
 
@@ -363,10 +303,6 @@ resultBox.addEventListener("click", async (event) => {
 
   try {
     if (act === "video") {
-      // Siapkan file selama iklan tampil, lalu simpan setelah pengunjung lanjut
-      getBlob(url, name, { size, label: "Mengunduh video" }).catch(() => {});
-      const ok = await showAdGate();
-      if (!ok) { progressBox.hidden = true; return; }
       await saveMedia(url, name, "video/mp4", { size, label: "Mengunduh video" });
     } else if (act === "audio") {
       await saveMedia(url, name, "audio/mpeg", { gallery: false, label: "Mengunduh audio" });

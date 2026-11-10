@@ -9,6 +9,7 @@ import { botGuard } from "../utils/botGuard.js";
 import { SecurityError, safeFetch } from "../utils/ssrf.js";
 import { logSecurity } from "../utils/securityLog.js";
 import { fail, publicMessage, toApiData } from "../utils/format.js";
+import { InputError, getHashtag, getProfile, parseHashtag, parseUsername } from "../services/profile.js";
 
 const router = Router();
 
@@ -54,6 +55,48 @@ async function lookup(input: unknown, req: Request, res: Response) {
 }
 
 router.get("/tiktok", lookupGuards, (req: Request, res: Response) => lookup(req.query.url, req, res));
+
+/* Profil TikTok: /api/user?unique_id=xxx | /api/user/xxx | /api/@xxx */
+async function profileLookup(input: unknown, req: Request, res: Response) {
+  const started = Date.now();
+  try {
+    const data = await getProfile(parseUsername(input));
+    if (res.headersSent) return;
+    res.setHeader("cache-control", "no-store");
+    res.json({
+      code: 0,
+      msg: "success",
+      processed_time: Number(((Date.now() - started) / 1000).toFixed(4)),
+      data: { ...data, avatar_download: `/api/download?url=${encodeURIComponent(data.avatar.large || data.avatar.medium)}&name=${encodeURIComponent(data.unique_id)}.jpg` }
+    });
+  } catch (error) {
+    if (!(error instanceof InputError)) console.error("[Tikobox] profil gagal:", error instanceof Error ? error.message : error);
+    if (res.headersSent) return;
+    res.status(error instanceof InputError ? 404 : 502).json(fail(publicMessage(error, "Gagal mengambil profil")));
+  }
+}
+
+/* Hashtag: /api/hashtag?name=xxx | /api/hashtag/xxx */
+async function hashtagLookup(input: unknown, req: Request, res: Response) {
+  const started = Date.now();
+  try {
+    const data = await getHashtag(parseHashtag(input));
+    if (res.headersSent) return;
+    res.setHeader("cache-control", "no-store");
+    res.json({ code: 0, msg: "success", processed_time: Number(((Date.now() - started) / 1000).toFixed(4)), data });
+  } catch (error) {
+    if (!(error instanceof InputError)) console.error("[Tikobox] hashtag gagal:", error instanceof Error ? error.message : error);
+    if (res.headersSent) return;
+    res.status(error instanceof InputError ? 404 : 502).json(fail(publicMessage(error, "Gagal mengambil hashtag")));
+  }
+}
+
+const q = (v: unknown) => (Array.isArray(v) ? v[0] : v);
+router.get("/user", lookupGuards, (req, res) => profileLookup(q(req.query.unique_id ?? req.query.username), req, res));
+router.get("/user/:username", lookupGuards, (req, res) => profileLookup(req.params.username, req, res));
+router.get("/hashtag", lookupGuards, (req, res) => hashtagLookup(q(req.query.name ?? req.query.hashtag), req, res));
+router.get("/hashtag/:name", lookupGuards, (req, res) => hashtagLookup(req.params.name, req, res));
+router.get(/^\/@([^/]+)$/, lookupGuards, (req, res) => profileLookup(req.params[0], req, res));
 
 router.get("/download", rateLimit({ name: "download", max: 60, windowMs: 60_000, suspiciousMax: 15 }), async (req, res) => {
   // Proxy ini hanya untuk halaman Tikobox sendiri; blokir hotlink dari situs lain.
@@ -137,7 +180,9 @@ router.get("/", lookupGuards, (req: Request, res: Response) => {
     usage: {
       format: "/api/ + link TikTok",
       example: "/api/https://vt.tiktok.com/xxxx",
-      supported: ["tiktok.com", "vt.tiktok.com", "vm.tiktok.com", "tt.site", "www.tt.site"]
+      supported: ["tiktok.com", "vt.tiktok.com", "vm.tiktok.com", "tt.site", "www.tt.site"],
+      profile: "/api/@username  atau  /api/user?unique_id=username",
+      hashtag: "/api/hashtag?name=fyp  atau  /api/hashtag/fyp"
     }
   });
 });

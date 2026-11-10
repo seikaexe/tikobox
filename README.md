@@ -22,6 +22,13 @@ Base URL otomatis mengikuti domain tempat situs dibuka. Buka `BASE_URL/?url=LINK
 
 API: `BASE_URL/api/` lalu tempel link TikTok apa adanya, hasilnya JSON. Contoh: `BASE_URL/api/https://vt.tiktok.com/xxxx`.
 
+## API profil & hashtag (semua di `/api/`)
+
+- `/api/@username` atau `/api/user?unique_id=username` : nickname, username, jumlah teman (`friend_count`), follower, mengikuti, jumlah video, total like, foto profil (`avatar.large/medium/thumb`, `avatar_download`), kapan akun dibuat (`created_at`), kapan nickname terakhir diubah (`nickname_changed_at`), kapan username terakhir diubah (`username_changed_at`), bio, verified, private, region.
+- `/api/hashtag?name=fyp` atau `/api/hashtag/fyp` : `stats.video_count` (jumlah video yang memakai hashtag) dan `stats.view_count` (jumlah penonton).
+
+Catatan: `created_at` memakai `createTime` TikTok; bila kosong dihitung dari ID akun. Waktu ubah nickname/username kosong (`""`) bila akun belum pernah mengubahnya atau TikTok tidak menyediakannya.
+
 ## Response API
 
 Formatnya mirip tikwm:

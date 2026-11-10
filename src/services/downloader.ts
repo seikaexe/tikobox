@@ -506,7 +506,7 @@ function extractRedirectUrl(
 /*
  * Ambil HTML halaman TikTok
  */
-async function fetchHtml(
+export async function fetchHtml(
   url: string
 ): Promise<{ html: string; cookie: string }> {
   const controller =
@@ -667,7 +667,7 @@ function extractTikTokData(
  * {...}
  * </script>
  */
-function extractScriptJson(
+export function extractScriptJson(
   html: string,
   id: string
 ): any | null {
