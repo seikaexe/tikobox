@@ -53,7 +53,7 @@ async function lookup(input: unknown, req: Request, res: Response) {
   }
 }
 
-router.get("/tiktok", lookupGuards, (req, res) => lookup(req.query.url, req, res));
+router.get("/tiktok", lookupGuards, (req: Request, res: Response) => lookup(req.query.url, req, res));
 
 router.get("/download", rateLimit({ name: "download", max: 60, windowMs: 60_000, suspiciousMax: 15 }), async (req, res) => {
   // Proxy ini hanya untuk halaman Tikobox sendiri; blokir hotlink dari situs lain.
@@ -128,7 +128,7 @@ router.get("/download", rateLimit({ name: "download", max: 60, windowMs: 60_000,
 });
 
 // /api/  : info penggunaan, atau proses langsung kalau ada ?url=
-router.get("/", lookupGuards, (req, res) => {
+router.get("/", lookupGuards, (req: Request, res: Response) => {
   if (req.query.url) return lookup(req.query.url, req, res);
   res.json({
     code: 0,
@@ -143,7 +143,7 @@ router.get("/", lookupGuards, (req, res) => {
 });
 
 // /api/https://vt.tiktok.com/xxx : tempel link apa adanya setelah /api/
-router.get("/*splat", lookupGuards, (req, res) => {
+router.get("/*splat", lookupGuards, (req: Request, res: Response) => {
   let raw = req.originalUrl.replace(/^\/api\//, "");
   try { raw = decodeURIComponent(raw); } catch {}
   // sebagian proxy menyatukan "//" menjadi "/"
