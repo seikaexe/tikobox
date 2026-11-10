@@ -1,24 +1,35 @@
-import { Router, type Response } from "express";
+import { Router, type Request, type Response } from "express";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
-import { Transform } from "node:stream";
-import { lookup } from "node:dns/promises";
-import { isIP } from "node:net";
 import { downloadTikTok, providerReferer, providerUserAgent } from "../services/downloader.js";
 import { isAllowedMediaUrl, isTikTokUrl, normalizeTikTokInput, safeFileName } from "../utils/validator.js";
 import { rateLimit } from "../utils/rateLimit.js";
-import { fail, toApiData } from "../utils/format.js";
-import { readMediaToken } from "../utils/mediaToken.js";
+import { apiGuard, requestTimeout } from "../utils/apiGuard.js";
+import { botGuard } from "../utils/botGuard.js";
+import { SecurityError, safeFetch } from "../utils/ssrf.js";
+import { logSecurity } from "../utils/securityLog.js";
+import { fail, publicMessage, toApiData } from "../utils/format.js";
 
 const router = Router();
+
+const UPSTREAM_HEADER_TIMEOUT_MS = 15_000;
+const LOOKUP_TIMEOUT_MS = 28_000;
+
+// Hanya media yang boleh diproxy. SVG/HTML sengaja tidak masuk agar tidak bisa jadi XSS.
+const ALLOWED_TYPES = /^(video\/|audio\/|image\/(jpeg|png|webp|gif|avif|heic)$|application\/octet-stream$)/;
+
+router.use(apiGuard, botGuard);
 
 router.get("/health", (_req, res) => {
   res.json({ code: 0, msg: "success", data: { status: "ok" } });
 });
 
-const lookupLimit = rateLimit(30, 60_000);
+const lookupGuards = [
+  rateLimit({ name: "lookup", max: 30, windowMs: 60_000, suspiciousMax: 12 }),
+  requestTimeout(LOOKUP_TIMEOUT_MS)
+];
 
-async function lookup(input: unknown, res: Response) {
+async function lookup(input: unknown, req: Request, res: Response) {
   const started = Date.now();
   const url = normalizeTikTokInput(input);
   if (!url || !isTikTokUrl(url)) {
@@ -29,112 +40,96 @@ async function lookup(input: unknown, res: Response) {
   try {
     const data = await downloadTikTok(url);
     res.setHeader("cache-control", "no-store");
+    if (res.headersSent) return; // sudah kena timeout 504
     res.json({ code: 0, msg: "success", processed_time: Number(((Date.now() - started) / 1000).toFixed(4)), data: toApiData(data) });
   } catch (error) {
-    console.error("[Tikobox] Lookup provider error:", error);
-    res.status(502).json(fail("Gagal memproses link. Provider mungkin sedang sibuk, coba lagi."));
+    if (error instanceof SecurityError) {
+      logSecurity("lookup_blocked", req, { code: error.code });
+    } else {
+      console.error("[Tikobox] lookup gagal:", error instanceof Error ? error.message : error);
+    }
+    if (res.headersSent) return;
+    res.status(502).json(fail(publicMessage(error)));
   }
 }
 
-router.get("/tiktok", lookupLimit, (req, res) => lookup(req.query.url, res));
+router.get("/tiktok", lookupGuards, (req, res) => lookup(req.query.url, req, res));
 
-const MAX_DOWNLOAD_BYTES = 100 * 1024 * 1024;
-const MEDIA_TIMEOUT_MS = 25_000;
-
-function isPublicAddress(address: string): boolean {
-  const version = isIP(address);
-  if (version === 4) {
-    const p = address.split(".").map(Number);
-    return !(p[0] === 0 || p[0] === 10 || p[0] === 127 || p[0] >= 224 ||
-      (p[0] === 169 && p[1] === 254) || (p[0] === 172 && p[1] >= 16 && p[1] <= 31) ||
-      (p[0] === 192 && p[1] === 168) || (p[0] === 100 && p[1] >= 64 && p[1] <= 127));
+router.get("/download", rateLimit({ name: "download", max: 60, windowMs: 60_000, suspiciousMax: 15 }), async (req, res) => {
+  // Proxy ini hanya untuk halaman Tikobox sendiri; blokir hotlink dari situs lain.
+  if (req.get("sec-fetch-site") === "cross-site") {
+    logSecurity("hotlink_blocked", req);
+    res.status(403).json(fail("Akses ditolak."));
+    return;
   }
-  if (version === 6) {
-    const a = address.toLowerCase();
-    return a !== "::" && a !== "::1" && !a.startsWith("fc") && !a.startsWith("fd") &&
-      !a.startsWith("fe8") && !a.startsWith("fe9") && !a.startsWith("fea") && !a.startsWith("feb") &&
-      !a.startsWith("::ffff:127.") && !a.startsWith("::ffff:10.") && !a.startsWith("::ffff:192.168.");
-  }
-  return false;
-}
 
-async function validateMediaDestination(value: string): Promise<URL | undefined> {
-  if (!isAllowedMediaUrl(value)) return undefined;
-  try {
-    const u = new URL(value);
-    if (u.protocol !== "https:" || u.username || u.password || (u.port && u.port !== "443")) return undefined;
-    const addresses = await lookup(u.hostname, { all: true, verbatim: true });
-    if (!addresses.length || addresses.some((item) => !isPublicAddress(item.address))) return undefined;
-    return u;
-  } catch { return undefined; }
-}
-
-async function fetchMediaSafely(initialUrl: string, cookie: string, signal: AbortSignal): Promise<Response | undefined> {
-  let target = initialUrl;
-  for (let hop = 0; hop <= 4; hop++) {
-    const safeUrl = await validateMediaDestination(target);
-    if (!safeUrl) return undefined;
-    const response = await fetch(safeUrl, {
-      headers: { "user-agent": providerUserAgent, referer: providerReferer, accept: "*/*", ...(cookie ? { cookie } : {}) },
-      signal,
-      redirect: "manual"
-    });
-    if (![301, 302, 303, 307, 308].includes(response.status)) return response;
-    const location = response.headers.get("location");
-    if (!location || hop === 4) return undefined;
-    target = new URL(location, safeUrl).href;
-    try { await response.body?.cancel(); } catch {}
+  const url = req.query.url;
+  if (!isAllowedMediaUrl(url)) {
+    let host = "";
+    try { host = typeof url === "string" ? new URL(url).hostname : ""; } catch {}
+    logSecurity("media_url_rejected", req, { host });
+    res.status(400).json(fail("URL media tidak diizinkan."));
+    return;
   }
-  return undefined;
-}
 
-router.get("/download", rateLimit(40, 60_000), async (req, res) => {
-  const rawUrl = req.query.url;
-  if (typeof rawUrl !== "string" || rawUrl.length > 2000) {
-    res.status(400).json(fail("URL media tidak valid.")); return;
-  }
   const name = safeFileName(req.query.name);
-  const cookie = readMediaToken(req.query.t) || "";
+  // Cookie hanya berisi karakter ASCII yang dapat dicetak (tanpa CR/LF/kontrol)
+  const cookie = typeof req.query.c === "string" ? req.query.c.replace(/[^\x20-\x7E]/g, "").slice(0, 2000) : "";
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), MEDIA_TIMEOUT_MS);
-  res.on("close", () => { if (!res.writableEnded) controller.abort(); });
+  res.on("close", () => controller.abort());
 
   try {
-    const upstream = await fetchMediaSafely(rawUrl, cookie, controller.signal);
-    if (!upstream) { res.status(400).json(fail("Alamat media atau redirect tidak diizinkan.")); return; }
-    if (!upstream.ok || !upstream.body) { res.status(502).json(fail("Provider gagal mengirim file.")); return; }
+    const upstream = await safeFetch(url, {
+      headers: { "user-agent": providerUserAgent, referer: providerReferer, accept: "*/*", ...(cookie ? { cookie } : {}) },
+      signal: controller.signal,
+      allowUrl: isAllowedMediaUrl,
+      timeoutMs: UPSTREAM_HEADER_TIMEOUT_MS
+    });
 
-    const type = upstream.headers.get("content-type") || "application/octet-stream";
-    const length = Number(upstream.headers.get("content-length") || 0);
-    if (length > MAX_DOWNLOAD_BYTES) { await upstream.body.cancel(); res.status(413).json(fail("Ukuran file melebihi batas 100 MB.")); return; }
-    if (!/^(video\/|audio\/|image\/|application\/octet-stream)/i.test(type)) {
-      await upstream.body.cancel(); res.status(415).json(fail("Tipe file dari provider tidak didukung.")); return;
+    if (!upstream.ok || !upstream.body) {
+      res.status(502).json(fail(`Gagal mengambil file dari provider (HTTP ${upstream.status}).`));
+      return;
     }
 
-    res.setHeader("content-type", /\.mp3$/i.test(name) ? "audio/mpeg" : type);
-    if (length) res.setHeader("content-length", String(length));
+    const upstreamType = (upstream.headers.get("content-type") || "application/octet-stream").split(";")[0].trim().toLowerCase();
+    if (!ALLOWED_TYPES.test(upstreamType)) {
+      logSecurity("media_type_rejected", req, { type: upstreamType });
+      await upstream.body.cancel().catch(() => {});
+      res.status(502).json(fail("Tipe file tidak didukung."));
+      return;
+    }
+
+    const length = Number(upstream.headers.get("content-length"));
+
+    let type = upstreamType;
+    // Nama .mp3 harus bertipe audio, bukan video/mp4, supaya tidak jadi .mp3.mp4
+    if (/\.mp3$/i.test(name)) type = "audio/mpeg";
+    res.setHeader("content-type", type);
+    if (Number.isFinite(length) && length > 0) res.setHeader("content-length", String(length));
     const inline = req.query.inline === "1";
     res.setHeader("content-disposition", `${inline ? "inline" : "attachment"}; filename="${name}"`);
-    res.setHeader("cache-control", "private, no-store, max-age=0");
+    res.setHeader("cache-control", "no-store");
     res.setHeader("x-content-type-options", "nosniff");
+    res.setHeader("content-security-policy", "default-src 'none'; sandbox");
 
-    let received = 0;
-    const limiter = new Transform({ transform(chunk, _encoding, callback) {
-      received += chunk.length;
-      if (received > MAX_DOWNLOAD_BYTES) callback(new Error("Download size limit exceeded"));
-      else callback(null, chunk);
-    }});
-    await pipeline(Readable.fromWeb(upstream.body as any), limiter, res);
+    await pipeline(Readable.fromWeb(upstream.body as any), res);
   } catch (error) {
-    if (!res.headersSent) res.status(502).json(fail("Gagal mengambil file, coba lagi."));
-    else if (!res.writableEnded) res.destroy();
-    if (!(error instanceof Error && error.name === "AbortError")) console.error("[Tikobox] Media proxy error:", error);
-  } finally { clearTimeout(timer); }
+    if (error instanceof SecurityError) {
+      logSecurity("ssrf_blocked", req, { code: error.code });
+    }
+
+    if (!res.headersSent) {
+      const status = error instanceof SecurityError ? 400 : 502;
+      res.status(status).json(fail(error instanceof SecurityError ? "URL media tidak diizinkan." : "Gagal mengambil file, coba lagi."));
+    } else if (!res.writableEnded) {
+      res.destroy();
+    }
+  }
 });
 
 // /api/  : info penggunaan, atau proses langsung kalau ada ?url=
-router.get("/", lookupLimit, (req, res) => {
-  if (req.query.url) return lookup(req.query.url, res);
+router.get("/", lookupGuards, (req, res) => {
+  if (req.query.url) return lookup(req.query.url, req, res);
   res.json({
     code: 0,
     msg: "success",
@@ -148,12 +143,12 @@ router.get("/", lookupLimit, (req, res) => {
 });
 
 // /api/https://vt.tiktok.com/xxx : tempel link apa adanya setelah /api/
-router.get("/*splat", lookupLimit, (req, res) => {
+router.get("/*splat", lookupGuards, (req, res) => {
   let raw = req.originalUrl.replace(/^\/api\//, "");
   try { raw = decodeURIComponent(raw); } catch {}
   // sebagian proxy menyatukan "//" menjadi "/"
   raw = raw.replace(/^(https?):\/(?!\/)/i, "$1://");
-  return lookup(raw, res);
+  return lookup(raw, req, res);
 });
 
 export default router;

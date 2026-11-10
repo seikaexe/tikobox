@@ -10,18 +10,16 @@
     "dev": "tsx watch src/server.ts",
     "start": "tsx src/server.ts",
     "typecheck": "tsc --noEmit",
-    "build": "tsc --noEmit",
-    "build:frontend": "terser public/assets/js/app.js --compress --mangle --comments false -o public/assets/js/app.min.js",
-    "postbuild": "npm run build:frontend"
+    "csp:print": "tsx -e \"import('./src/utils/csp.ts').then(m=>console.log(m.cspString()))\""
   },
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "helmet": "^8.1.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/node": "^24.0.0",
     "tsx": "^4.19.4",
-    "typescript": "^5.8.3",
-    "terser": "^5.44.0"
+    "typescript": "^5.8.3"
   }
 }

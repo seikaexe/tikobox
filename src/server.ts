@@ -1,27 +1,29 @@
 import express, { type NextFunction, type Request, type RequestHandler, type Response } from "express";
+import helmet from "helmet";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import apiRouter from "./routes/api.js";
+import { cspDirectives } from "./utils/csp.js";
+import { fail } from "./utils/format.js";
 
 const app = express();
 app.disable("x-powered-by");
-app.set("trust proxy", 1);
+// Percayai proxy hanya di Vercel / bila TRUST_PROXY=1 (lihat utils/clientIp.ts)
+app.set("trust proxy", process.env.VERCEL || process.env.TRUST_PROXY === "1" ? 1 : false);
 
-// Security headers; allow the existing AdSense integration and docs inline snippet.
-app.use((_req, res, next) => {
-  res.setHeader("X-Content-Type-Options", "nosniff");
-  res.setHeader("X-Frame-Options", "SAMEORIGIN");
-  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
-  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
-  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-  res.setHeader("Content-Security-Policy", "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net; connect-src 'self' https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net; frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com");
-  if (process.env.NODE_ENV === "production") res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
-  next();
-});
+// Security headers. Catatan: di Vercel halaman statis dilayani CDN, jadi header
+// untuk halaman diatur lewat vercel.json; Helmet melindungi /api dan mode lokal.
+app.use(
+  helmet({
+    contentSecurityPolicy: { useDefaults: false, directives: cspDirectives },
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    hsts: { maxAge: 63_072_000, includeSubDomains: true }
+  })
+);
 
 app.use("/api", apiRouter);
 app.use("/api", (_req, res) => {
-  res.status(404).json({ code: -1, msg: "Endpoint tidak ditemukan." });
+  res.status(404).json(fail("Endpoint tidak ditemukan."));
 });
 
 // Di Vercel, folder public/ dilayani CDN dan express.static diabaikan, jadi
@@ -37,11 +39,21 @@ app.use(express.static(publicDir));
 app.get("/", sendPage("index.html"));
 app.get("/docs", sendPage("docs.html"));
 
-// Tangani error supaya function tidak masuk keadaan tidak menentu.
+app.use((_req, res) => {
+  res.status(404).type("text/plain").send("Halaman tidak ditemukan.");
+});
+
+// Error handler: detail dan stack trace hanya ke log server, tidak ke klien.
 app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
-  console.error(err);
+  const status =
+    typeof err === "object" && err !== null && "status" in err && typeof (err as { status: unknown }).status === "number"
+      ? (err as { status: number }).status
+      : 500;
+  const clientError = status >= 400 && status < 500;
+
+  if (!clientError) console.error(err);
   if (res.headersSent) return;
-  res.status(500).json({ code: -1, msg: "Terjadi kesalahan pada server." });
+  res.status(clientError ? status : 500).json(fail(clientError ? "Permintaan tidak valid." : "Terjadi kesalahan pada server."));
 });
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);

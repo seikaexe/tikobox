@@ -21,6 +21,11 @@ const MEDIA_HOST_SUFFIXES = [
   "tiktok.com"
 ];
 
+/* Tolak kredensial di URL (user:pass@host) dan port non-default. */
+function hasPlainAuthority(u: URL): boolean {
+  return !u.username && !u.password && !u.port;
+}
+
 /*
  * Ambil link TikTok / tt.site dari teks yang ditempel.
  * Boleh tanpa https://, boleh ada caption di sekitarnya.
@@ -50,6 +55,8 @@ export function isTikTokUrl(value: unknown): value is string {
       return false;
     }
 
+    if (!hasPlainAuthority(u)) return false;
+
     const host = u.hostname.toLowerCase();
 
     return (
@@ -71,6 +78,8 @@ export function isAllowedMediaUrl(value: unknown): value is string {
     if (u.protocol !== "https:" && u.protocol !== "http:") {
       return false;
     }
+
+    if (!hasPlainAuthority(u)) return false;
 
     const host = u.hostname.toLowerCase();
 

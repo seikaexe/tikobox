@@ -50,7 +50,7 @@ function adapt(d) {
     video: slides ? undefined : { hd, sd: d.play || d.hdplay, hdSize: d.hd_size, sdSize: d.size },
     audio: d.music,
     images: slides ? d.images : undefined,
-    mediaToken: d.media_token
+    cookie: d.cookie
   };
 }
 
@@ -61,8 +61,8 @@ function esc(value) {
 }
 
 function proxyUrl(url, name) {
-  const token = current?.mediaToken ? `&t=${encodeURIComponent(current.mediaToken)}` : "";
-  return `${API}/download?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name)}${token}`;
+  const c = current?.cookie ? `&c=${encodeURIComponent(current.cookie)}` : "";
+  return `${API}/download?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name)}${c}`;
 }
 
 // Gambar lewat proxy supaya tidak diblokir hotlink/referrer TikTok
@@ -70,9 +70,15 @@ function imgProxy(url) {
   return `${API}/download?url=${encodeURIComponent(url)}&name=img.jpg&inline=1`;
 }
 
+// Fallback gambar: kalau lewat proxy gagal, coba URL aslinya. Pakai listener
+// (bukan atribut onerror) supaya CSP tidak perlu mengizinkan inline handler.
+document.addEventListener("error", (e) => {
+  const el = e.target;
+  if (el instanceof HTMLImageElement && el.dataset.src && el.src !== el.dataset.src) el.src = el.dataset.src;
+}, true);
+
 function imgTag(url, cls, alt, id = "") {
-  const fallback = "if(this.dataset.src&&this.src!==this.dataset.src){this.src=this.dataset.src}";
-  return `<img ${id ? `id="${id}" ` : ""}class="${cls}" src="${esc(imgProxy(url))}" data-src="${esc(url)}" alt="${alt}" referrerpolicy="no-referrer" onerror="${fallback}">`;
+  return `<img ${id ? `id="${id}" ` : ""}class="${cls}" src="${esc(imgProxy(url))}" data-src="${esc(url)}" alt="${alt}" referrerpolicy="no-referrer">`;
 }
 
 // Ambil link TikTok / tt.site dari teks yang ditempel (boleh tanpa https://)

@@ -5,6 +5,7 @@
 */
 
 import { Readable } from "node:stream";
+import { assertPublicHost, safeFetch } from "../utils/ssrf.js";
 
 export type TikTokResult = {
   id?: string;
@@ -153,6 +154,10 @@ async function resolveTikTokUrl(
         "Link tidak mengarah ke halaman TikTok"
       );
     }
+
+    await assertPublicHost(
+      new URL(current).hostname
+    );
 
     const controller =
       new AbortController();
@@ -514,25 +519,25 @@ async function fetchHtml(
     );
 
   try {
-    let current = url;
-    let response: Response | undefined;
-    for (let hop = 0; hop <= 4; hop++) {
-      if (!isTikTokHost(current) && !isShortlinkHost(current)) {
-        throw new Error("Redirect TikTok tidak diizinkan");
-      }
-      response = await fetch(current, {
-        headers: HEADERS,
-        redirect: "manual",
-        signal: controller.signal
-      });
-      const location = response.headers.get("location");
-      if (![301, 302, 303, 307, 308].includes(response.status)) break;
-      if (!location || hop === 4) throw new Error("Terlalu banyak redirect TikTok");
-      current = new URL(location, current).href;
-      try { await response.body?.cancel(); } catch {}
-    }
+    const response =
+      await safeFetch(
+        url,
+        {
+          headers:
+            HEADERS,
 
-    if (!response || !response.ok) {
+          signal:
+            controller.signal,
+
+          allowUrl: (u) =>
+            isTikTokHost(u) ||
+            isShortlinkHost(u)
+        }
+      );
+
+    if (
+      !response.ok
+    ) {
       throw new Error(
         `TikTok returned HTTP ${response.status}`
       );

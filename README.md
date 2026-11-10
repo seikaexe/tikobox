@@ -59,13 +59,24 @@ Server biasa (non-Vercel):
 npm start
 ```
 
-Port default 3000. Ubah lewat environment variable `PORT` bila perlu. Project ini tidak memakai database dan tidak membutuhkan file `.env`.
+Port default 3000. Ubah lewat environment variable `PORT` bila perlu. Project ini tidak memakai database. Environment variable bersifat opsional (lihat bagian Keamanan).
 
 Gunakan downloader hanya untuk konten yang kamu berhak unduh dan sesuai kebijakan platform serta hukum yang berlaku.
 
+## Keamanan
+
+- **Security headers**: Helmet untuk `/api` dan mode lokal; `vercel.json` untuk halaman statis di Vercel. CSP didefinisikan di `src/utils/csp.ts`. Kalau diubah, jalankan `npm run csp:print` lalu salin hasilnya ke `vercel.json`.
+- **SSRF**: redirect diikuti manual, tiap hop divalidasi (allowlist host, http/https, tanpa kredensial/port, DNS harus publik). Lihat `src/utils/ssrf.ts`.
+- **Download**: tanpa batas ukuran/durasi (sengaja dihilangkan). Tetap ada rate limit, dan hanya tipe video/audio/gambar yang boleh diproxy.
+- **Timeout**: 15 detik menunggu header dari upstream, 28 detik untuk lookup (tidak membatasi lama download).
+- **Rate limit terpusat**: otomatis memakai Upstash Redis bila ada `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` (atau `KV_REST_API_URL` + `KV_REST_API_TOKEN` dari integrasi Upstash di Vercel). Tanpa itu dipakai Map lokal (hanya per-instance).
+- **Bot protection**: scanner keamanan diblokir; klien otomatis (curl, python, dll) kena batas lebih ketat. `BOT_MODE=block` untuk memblokir total.
+- **Security log**: satu baris JSON per kejadian (`type: "security"`), tanpa cookie/query/header, IP disamarkan.
+- `TRUST_PROXY=1` hanya bila di belakang proxy sendiri (bukan Vercel).
+
 ## Deploy Vercel
 
-Tidak perlu build command dan tidak perlu environment variable.
+Tidak perlu build command. Environment variable opsional (lihat bagian Keamanan); untuk rate limit terpusat tambahkan Upstash Redis dari Vercel Marketplace.
 
 1. Push project ke GitHub, lalu import di Vercel. Framework terdeteksi otomatis sebagai Express.
 2. Biarkan Build Command, Output Directory, dan Install Command kosong (default).
@@ -80,11 +91,3 @@ Cara kerjanya:
 - `express.static` hanya berlaku saat dijalankan lokal, di Vercel diabaikan
 
 Untuk cek tipe sebelum deploy, jalankan `npm run typecheck`.
-
-## Security configuration
-
-Set `MEDIA_TOKEN_SECRET` in your deployment environment to a random secret of at least 32 characters. It encrypts short-lived media cookies so raw TikTok cookies are never returned to the browser. Example generation command: `openssl rand -base64 48`.
-
-Build the frontend asset with `npm install` followed by `npm run build:frontend`; this uses Terser to produce `public/assets/js/app.min.js`. The source `app.js` is not referenced by the page. Minification is only a readability deterrent, not a way to hide browser-delivered code.
-
-The media proxy only accepts HTTPS media hosts on the allowlist, validates DNS results and every redirect, and caps streamed downloads at 100 MB. The in-memory rate limiter is per-instance; use a shared Redis/Valkey-backed limiter for high-traffic or multi-instance deployments.

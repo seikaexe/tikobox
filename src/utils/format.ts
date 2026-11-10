@@ -1,5 +1,4 @@
 import type { TikTokResult } from "../services/downloader.js";
-import { createMediaToken } from "./mediaToken.js";
 
 /*
  * Bentuk response API (mirip tikwm):
@@ -14,7 +13,6 @@ export function toApiData(r: TikTokResult) {
   const wmplay = v.wm ?? play;
   const m = r.music;
   const st = r.stats ?? {};
-  const mediaToken = createMediaToken(r.cookie);
 
   return {
     id: r.id ?? "",
@@ -54,10 +52,27 @@ export function toApiData(r: TikTokResult) {
       avatar: r.author?.avatar ?? ""
     },
     ...(r.images?.length ? { images: r.images } : {}),
-    ...(mediaToken ? { media_token: mediaToken } : {})
+    ...(r.cookie ? { cookie: r.cookie } : {})
   };
 }
 
 export function fail(message: string) {
   return { code: -1, msg: message };
+}
+
+/*
+ * Pesan error yang aman ditampilkan ke klien: tanpa detail jaringan internal,
+ * path file, atau stack trace. Detail asli tetap ada di log server.
+ */
+export function publicMessage(error: unknown, fallback = "Gagal memproses URL"): string {
+  if (error instanceof Error) {
+    if (error.name === "SecurityError") return "Link tidak diizinkan.";
+    if (error.name === "AbortError" || error.name === "TimeoutError") {
+      return "Permintaan ke TikTok terlalu lama, coba lagi.";
+    }
+    const m = error.message;
+    const leaky = /(ECONN|ENOTFOUND|EAI_AGAIN|ETIMEDOUT|EPIPE|fetch failed|undici|\bat \S+:\d+|[A-Za-z]:\\|\/(home|var|usr|tmp|node_modules)\b)/i;
+    if (m && m.length <= 160 && !leaky.test(m)) return m;
+  }
+  return fallback;
 }
