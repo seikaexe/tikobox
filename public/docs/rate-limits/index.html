@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5ef">
+  <title>Rate Limit - Tikobox Docs</title>
+  <meta name="description" content="Batas request per menit">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://tikobox.vercel.app/docs/rate-limits/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tikobox">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:title" content="Rate Limit - Tikobox Docs">
+  <meta property="og:description" content="Batas request per menit">
+  <meta property="og:url" content="https://tikobox.vercel.app/docs/rate-limits/">
+  <meta property="og:image" content="https://tikobox.vercel.app/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="1200">
+  <meta property="og:image:alt" content="Logo Tikobox">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Rate Limit - Tikobox Docs">
+  <meta name="twitter:description" content="Batas request per menit">
+  <meta name="twitter:image" content="https://tikobox.vercel.app/og-image.png">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/docs.css">
+  <meta name="monetag" content="cf97f76e709b8bde5c0e811e064a9711">
+</head>
+<body class="dx-body">
+<nav class="nav">
+  <a class="brand" href="/"><span>TIKO</span>BOX</a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a class="active" href="/docs/">Docs</a>
+  </div>
+</nav>
+<div class="dx-bar">
+  <button id="menuBtn" class="btn btn-sm" type="button" aria-expanded="false" aria-controls="side">MENU</button>
+  <button id="searchBtn" class="btn btn-sm btn-blue" type="button">CARI</button>
+  <span class="dx-crumb">Mulai</span>
+</div>
+<div class="dx">
+  <aside class="dx-side" id="side" aria-label="Navigasi dokumentasi">
+    <div class="dx-search">
+      <label class="sr" for="q">Cari dokumentasi</label>
+      <input id="q" type="search" placeholder="Cari dokumentasi" autocomplete="off" spellcheck="false">
+      <kbd aria-hidden="true">/</kbd>
+    </div>
+    <div id="results" class="dx-results" hidden></div>
+    <nav id="navlist"><div class="dx-group"><div class="dx-group-title">Mulai</div><a class="dx-link" href="/docs/">Beranda</a><a class="dx-link" href="/docs/getting-started/">Memulai</a><a class="dx-link" href="/docs/base-url/">Base URL</a><a class="dx-link" href="/docs/authentication/">Autentikasi</a><a class="dx-link on" href="/docs/rate-limits/" aria-current="page">Rate Limit</a><a class="dx-link" href="/docs/errors/">Penanganan Error</a><a class="dx-link" href="/docs/changelog/">Changelog</a></div><div class="dx-group"><div class="dx-group-title">Downloader</div><a class="dx-link" href="/docs/downloader/video/">Video Downloader</a><a class="dx-link" href="/docs/downloader/audio/">Audio Downloader</a><a class="dx-link" href="/docs/downloader/slideshow/">Slideshow Downloader</a><a class="dx-link" href="/docs/downloader/media-proxy/">Media Proxy</a></div><div class="dx-group"><div class="dx-group-title">TikTok</div><a class="dx-link" href="/docs/tiktok/profile/">Profil TikTok</a><a class="dx-link" href="/docs/tiktok/hashtag/">Hashtag TikTok</a></div><div class="dx-group"><div class="dx-group-title">Utility</div><a class="dx-link" href="/docs/utility/health/">Health Check</a><a class="dx-link" href="/docs/utility/info/">API Info</a></div><div class="dx-group"><div class="dx-group-title">Panduan</div><a class="dx-link" href="/docs/guides/curl/">cURL</a><a class="dx-link" href="/docs/guides/javascript/">JavaScript</a><a class="dx-link" href="/docs/guides/nodejs/">Node.js</a><a class="dx-link" href="/docs/guides/python/">Python</a><a class="dx-link" href="/docs/guides/php/">PHP</a><a class="dx-link" href="/docs/guides/web/">Aplikasi Web</a></div><div class="dx-group"><div class="dx-group-title">Referensi</div><a class="dx-link" href="/docs/reference/response-format/">Format Response</a><a class="dx-link" href="/docs/reference/status-codes/">Status Code</a><a class="dx-link" href="/docs/reference/security/">Keamanan dan Batasan</a><a class="dx-link" href="/docs/reference/not-available/">Belum Tersedia</a><a class="dx-link" href="/docs/reference/faq/">FAQ</a></div></nav>
+  </aside>
+  <div class="dx-overlay" id="overlay" hidden></div>
+  <main class="dx-main">
+    <article class="doc-content">
+      <div class="badge">MULAI</div>
+      <h1>Rate Limit</h1>
+      <p class="lead">Batas request per menit</p>
+      <details class="toc-inline"><summary>Di halaman ini</summary><ul><li><a href="#klien-otomatis">Klien Otomatis</a></li><li><a href="#header">Header Response</a></li><li><a href="#respons-429">Response 429</a></li><li><a href="#catatan">Catatan</a></li></ul></details>
+      <p>Batas dihitung per alamat IP dengan jendela tetap 60 detik. Hitungan di-reset saat jendela berganti</p>
+<div class="tbl "><table><thead><tr><th>Kelompok</th><th>Endpoint</th><th>Normal</th><th>Klien otomatis</th></tr></thead><tbody><tr><td>lookup</td><td><code>/api/tiktok</code>, <code>/api/{link}</code>, <code>/api/user</code>, <code>/api/hashtag</code>, <code>/api/</code></td><td>30 per menit</td><td>12 per menit</td></tr><tr><td>download</td><td><code>/api/download</code></td><td>60 per menit</td><td>15 per menit</td></tr><tr><td>-</td><td><code>/api/health</code></td><td>Tanpa batas</td><td>Tanpa batas</td></tr></tbody></table></div>
+<div class="note note-warn">Semua endpoint kelompok lookup berbagi satu hitungan yang sama. Satu request profil, hashtag, atau video masing-masing memakai jatah 30 per menit yang sama</div>
+<h2 id="klien-otomatis">Klien Otomatis<a class="anchor" href="#klien-otomatis" aria-label="Tautan ke bagian ini">#</a></h2>
+<p>Request dianggap klien otomatis jika <code>User-Agent</code> kosong, kurang dari 10 karakter, atau mengandung nama tool umum seperti curl, wget, python-requests, axios, node-fetch, undici, okhttp, Postman, dan sejenisnya. Klien seperti ini mendapat batas yang lebih ketat seperti pada tabel</p>
+<p>Scanner keamanan (misalnya sqlmap, nikto, nmap) selalu ditolak dengan status <code>403</code></p>
+<h2 id="header">Header Response<a class="anchor" href="#header" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="tbl "><table><thead><tr><th>Header</th><th>Isi</th></tr></thead><tbody><tr><td><code>ratelimit-limit</code></td><td>Batas untuk request ini</td></tr><tr><td><code>ratelimit-remaining</code></td><td>Sisa jatah pada jendela berjalan</td></tr><tr><td><code>ratelimit-reset</code></td><td>Detik sampai jendela berganti</td></tr><tr><td><code>retry-after</code></td><td>Detik yang harus ditunggu, hanya pada status 429</td></tr></tbody></table></div>
+<h2 id="respons-429">Response 429<a class="anchor" href="#respons-429" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="code"><div class="code-head"><span class="code-lang">429</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="json">{
+  &quot;code&quot;: -1,
+  &quot;msg&quot;: &quot;Terlalu banyak permintaan. Coba lagi sebentar lagi.&quot;
+}</code></pre></div>
+<p>Tunggu selama nilai <code>retry-after</code> lalu ulangi. Contoh penanganan otomatis ada di setiap <a href="/docs/guides/nodejs/">panduan bahasa</a></p>
+<h2 id="catatan">Catatan<a class="anchor" href="#catatan" aria-label="Tautan ke bagian ini">#</a></h2>
+<ul><li>Download tidak dibatasi ukuran file maupun durasi video, hanya dibatasi jumlah request</li><li>Pada deployment tanpa Redis, hitungan disimpan di memori tiap instance sehingga bisa terpisah antar instance. Redis (Upstash) bersifat opsional dan hanya perlu diatur oleh pemilik deployment</li></ul>
+      <div class="pager">
+        <a class="pager-a" href="/docs/authentication/"><small>Sebelumnya</small><b>Autentikasi</b></a>
+        <a class="pager-a pager-next" href="/docs/errors/"><small>Berikutnya</small><b>Penanganan Error</b></a>
+      </div>
+    </article>
+  </main>
+  <aside class="dx-toc" aria-label="Daftar isi">
+    <div class="dx-toc-in"><b>DI HALAMAN INI</b><ul><li><a href="#klien-otomatis">Klien Otomatis</a></li><li><a href="#header">Header Response</a></li><li><a href="#respons-429">Response 429</a></li><li><a href="#catatan">Catatan</a></li></ul></div>
+  </aside>
+</div>
+<footer>
+  <span>© 2026 Tikobox</span>
+  <span>Dokumentasi API</span>
+</footer>
+<script src="/assets/js/docs.js" defer></script>
+</body>
+</html>

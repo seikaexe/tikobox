@@ -1,6 +1,6 @@
 # Saran celah / risiko (hasil baca kode)
 
-1. **CSP `script-src 'unsafe-inline'`** (csp.ts / vercel.json): dulu perlu untuk iklan. Sekarang `index.html` tidak butuh inline script; `docs.html` baris ~98 masih punya `<script>` inline. Pindahkan ke `docs.js` lalu hapus `'unsafe-inline'` dari `script-src`.
+1. **CSP `script-src 'unsafe-inline'`** (csp.ts / vercel.json): dulu perlu untuk iklan. Sekarang `index.html` tidak butuh inline script; `docs` kini tanpa script inline (sudah dipindah ke `docs.js`). Tinggal hapus `'unsafe-inline'` dari `script-src`.
 2. **`img-src https:`** terlalu longgar. Batasi ke domain CDN TikTok (`TIKTOK_MEDIA`) + `'self'` karena gambar sudah lewat `/api/download`.
 3. **Endpoint `/api/download` adalah open proxy terbatas** (host TikTok saja, sudah ada SSRF guard). Bagus; pastikan `safeFetch` memvalidasi ulang IP di setiap redirect (DNS rebinding) dan batasi ukuran maksimum body.
 4. **Rate limit**: kalau tidak ada Redis (`rateLimit.ts`), limit hanya in-memory per instance serverless sehingga mudah dilewati. Pasang Redis/Upstash untuk produksi.

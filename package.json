@@ -10,7 +10,9 @@
     "dev": "tsx watch src/server.ts",
     "start": "tsx src/server.ts",
     "typecheck": "tsc --noEmit",
-    "csp:print": "tsx -e \"import('./src/utils/csp.ts').then(m=>console.log(m.cspString()))\""
+    "csp:print": "tsx -e \"import('./src/utils/csp.ts').then(m=>console.log(m.cspString()))\"",
+    "docs:build": "node scripts/build-docs.mjs",
+    "docs:test": "node scripts/docs/test-examples.mjs"
   },
   "dependencies": {
     "express": "^5.1.0",

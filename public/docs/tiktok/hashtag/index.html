@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5ef">
+  <title>Hashtag TikTok - Tikobox Docs</title>
+  <meta name="description" content="Jumlah video dan total views hashtag">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://tikobox.vercel.app/docs/tiktok/hashtag/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tikobox">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:title" content="Hashtag TikTok - Tikobox Docs">
+  <meta property="og:description" content="Jumlah video dan total views hashtag">
+  <meta property="og:url" content="https://tikobox.vercel.app/docs/tiktok/hashtag/">
+  <meta property="og:image" content="https://tikobox.vercel.app/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="1200">
+  <meta property="og:image:alt" content="Logo Tikobox">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Hashtag TikTok - Tikobox Docs">
+  <meta name="twitter:description" content="Jumlah video dan total views hashtag">
+  <meta name="twitter:image" content="https://tikobox.vercel.app/og-image.png">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/docs.css">
+  <meta name="monetag" content="cf97f76e709b8bde5c0e811e064a9711">
+</head>
+<body class="dx-body">
+<nav class="nav">
+  <a class="brand" href="/"><span>TIKO</span>BOX</a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a class="active" href="/docs/">Docs</a>
+  </div>
+</nav>
+<div class="dx-bar">
+  <button id="menuBtn" class="btn btn-sm" type="button" aria-expanded="false" aria-controls="side">MENU</button>
+  <button id="searchBtn" class="btn btn-sm btn-blue" type="button">CARI</button>
+  <span class="dx-crumb">TikTok</span>
+</div>
+<div class="dx">
+  <aside class="dx-side" id="side" aria-label="Navigasi dokumentasi">
+    <div class="dx-search">
+      <label class="sr" for="q">Cari dokumentasi</label>
+      <input id="q" type="search" placeholder="Cari dokumentasi" autocomplete="off" spellcheck="false">
+      <kbd aria-hidden="true">/</kbd>
+    </div>
+    <div id="results" class="dx-results" hidden></div>
+    <nav id="navlist"><div class="dx-group"><div class="dx-group-title">Mulai</div><a class="dx-link" href="/docs/">Beranda</a><a class="dx-link" href="/docs/getting-started/">Memulai</a><a class="dx-link" href="/docs/base-url/">Base URL</a><a class="dx-link" href="/docs/authentication/">Autentikasi</a><a class="dx-link" href="/docs/rate-limits/">Rate Limit</a><a class="dx-link" href="/docs/errors/">Penanganan Error</a><a class="dx-link" href="/docs/changelog/">Changelog</a></div><div class="dx-group"><div class="dx-group-title">Downloader</div><a class="dx-link" href="/docs/downloader/video/">Video Downloader</a><a class="dx-link" href="/docs/downloader/audio/">Audio Downloader</a><a class="dx-link" href="/docs/downloader/slideshow/">Slideshow Downloader</a><a class="dx-link" href="/docs/downloader/media-proxy/">Media Proxy</a></div><div class="dx-group"><div class="dx-group-title">TikTok</div><a class="dx-link" href="/docs/tiktok/profile/">Profil TikTok</a><a class="dx-link on" href="/docs/tiktok/hashtag/" aria-current="page">Hashtag TikTok</a></div><div class="dx-group"><div class="dx-group-title">Utility</div><a class="dx-link" href="/docs/utility/health/">Health Check</a><a class="dx-link" href="/docs/utility/info/">API Info</a></div><div class="dx-group"><div class="dx-group-title">Panduan</div><a class="dx-link" href="/docs/guides/curl/">cURL</a><a class="dx-link" href="/docs/guides/javascript/">JavaScript</a><a class="dx-link" href="/docs/guides/nodejs/">Node.js</a><a class="dx-link" href="/docs/guides/python/">Python</a><a class="dx-link" href="/docs/guides/php/">PHP</a><a class="dx-link" href="/docs/guides/web/">Aplikasi Web</a></div><div class="dx-group"><div class="dx-group-title">Referensi</div><a class="dx-link" href="/docs/reference/response-format/">Format Response</a><a class="dx-link" href="/docs/reference/status-codes/">Status Code</a><a class="dx-link" href="/docs/reference/security/">Keamanan dan Batasan</a><a class="dx-link" href="/docs/reference/not-available/">Belum Tersedia</a><a class="dx-link" href="/docs/reference/faq/">FAQ</a></div></nav>
+  </aside>
+  <div class="dx-overlay" id="overlay" hidden></div>
+  <main class="dx-main">
+    <article class="doc-content">
+      <div class="badge">TIKTOK</div>
+      <h1>Hashtag TikTok</h1>
+      <p class="lead">Jumlah video dan total views hashtag</p>
+      <details class="toc-inline"><summary>Di halaman ini</summary><ul><li><a href="#parameter">Parameter</a></li><li><a href="#request">Contoh Request</a></li><li><a href="#sukses">Response Sukses</a></li><li><a href="#field">Field data</a></li><li><a href="#sumber">Sumber Data dan Batasan</a></li><li><a href="#error">Response Error</a></li></ul></details>
+      <div class="ep"><span class="m m-get">GET</span><code class="ep-path">/api/hashtag</code></div>
+<div class="ep"><span class="m m-get">GET</span><code class="ep-path">/api/hashtag/{name}</code></div>
+<p>Mengambil informasi dan statistik satu hashtag dari halaman tag TikTok. Daftar video milik hashtag tidak tersedia</p>
+<h2 id="parameter">Parameter<a class="anchor" href="#parameter" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="tbl "><table><thead><tr><th>Parameter</th><th>Tipe</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td><code>name</code></td><td><code class="nw">string</code></td><td><span class="req">wajib</span></td><td>Nama hashtag, dengan atau tanpa <code>#</code>. Query <code>hashtag</code> diterima sebagai alias. Pada bentuk path <code>/api/hashtag/{name}</code>, nama ditulis langsung di URL</td></tr></tbody></table></div>
+<p>Aturan nama: 1 sampai 100 karakter berupa huruf (termasuk huruf non-Latin), angka, dan underscore</p>
+<div class="note note-warn">Karakter <code>#</code> pada URL dianggap fragment oleh browser dan HTTP client. Tulis tanpa <code>#</code> atau encode menjadi <code>%23</code></div>
+<h2 id="request">Contoh Request<a class="anchor" href="#request" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="tabs"><div class="tab-list" role="tablist"><button class="tab on" type="button" role="tab" data-tab="curl" aria-selected="true">cURL</button><button class="tab" type="button" role="tab" data-tab="fetch" aria-selected="false">Fetch</button><button class="tab" type="button" role="tab" data-tab="node" aria-selected="false">Node.js</button><button class="tab" type="button" role="tab" data-tab="python" aria-selected="false">Python</button><button class="tab" type="button" role="tab" data-tab="php" aria-selected="false">PHP</button></div><div class="tab-panel on" role="tabpanel" data-panel="curl"><div class="code"><div class="code-head"><span class="code-lang">cURL</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="bash">curl -sS -G &quot;https://tikobox.my.id/api/hashtag&quot; \
+  -A &quot;MyTikoboxClient/1.0&quot; \
+  --data-urlencode &quot;name=fyp&quot;</code></pre></div></div><div class="tab-panel" role="tabpanel" data-panel="fetch"><div class="code"><div class="code-head"><span class="code-lang">Fetch</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="js">const url = new URL(&quot;https://tikobox.my.id/api/hashtag&quot;)
+url.searchParams.set(&quot;name&quot;, &quot;fyp&quot;)
+
+const res = await fetch(url)
+const json = await res.json()
+
+if (json.code !== 0) throw new Error(`${res.status} ${json.msg}`)
+console.log(json.data)</code></pre></div></div><div class="tab-panel" role="tabpanel" data-panel="node"><div class="code"><div class="code-head"><span class="code-lang">Node.js</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="js">const url = new URL(&quot;https://tikobox.my.id/api/hashtag&quot;)
+url.searchParams.set(&quot;name&quot;, &quot;fyp&quot;)
+
+const res = await fetch(url, { headers: { &quot;User-Agent&quot;: &quot;MyTikoboxClient/1.0&quot; } })
+const json = await res.json()
+
+if (json.code !== 0) throw new Error(`${res.status} ${json.msg}`)
+console.log(json.data)</code></pre></div></div><div class="tab-panel" role="tabpanel" data-panel="python"><div class="code"><div class="code-head"><span class="code-lang">Python</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="python">import requests
+
+res = requests.get(
+    &quot;https://tikobox.my.id/api/hashtag&quot;,
+    params={
+        &quot;name&quot;: &quot;fyp&quot;,
+    },
+    headers={&quot;User-Agent&quot;: &quot;MyTikoboxClient/1.0&quot;},
+    timeout=35,
+)
+
+data = res.json()
+
+if data[&quot;code&quot;] != 0:
+    raise RuntimeError(f'{res.status_code} {data[&quot;msg&quot;]}')
+
+print(data[&quot;data&quot;])</code></pre></div></div><div class="tab-panel" role="tabpanel" data-panel="php"><div class="code"><div class="code-head"><span class="code-lang">PHP</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="php">&lt;?php
+
+$query = http_build_query([
+    &quot;name&quot; =&gt; &quot;fyp&quot;,
+]);
+
+$ch = curl_init(&quot;https://tikobox.my.id/api/hashtag&quot; . &quot;?&quot; . $query);
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER =&gt; true,
+    CURLOPT_TIMEOUT =&gt; 35,
+    CURLOPT_USERAGENT =&gt; &quot;MyTikoboxClient/1.0&quot;,
+]);
+
+$body = curl_exec($ch);
+if ($body === false) {
+    throw new RuntimeException(curl_error($ch));
+}
+
+$status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+$json = json_decode($body, true);
+
+if (($json[&quot;code&quot;] ?? -1) !== 0) {
+    throw new RuntimeException($status . &quot; &quot; . ($json[&quot;msg&quot;] ?? &quot;error&quot;));
+}
+
+print_r($json[&quot;data&quot;]);</code></pre></div></div></div>
+<div class="code"><div class="code-head"><span class="code-lang">Bentuk path</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="bash">curl -sS -A &quot;MyTikoboxClient/1.0&quot; &quot;https://tikobox.my.id/api/hashtag/fyp&quot;</code></pre></div>
+<h2 id="sukses">Response Sukses<a class="anchor" href="#sukses" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="note note-info">Nilai pada contoh response bersifat ilustrasi, bukan data nyata</div>
+<div class="code"><div class="code-head"><span class="code-lang">200</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="json">{
+  &quot;code&quot;: 0,
+  &quot;msg&quot;: &quot;success&quot;,
+  &quot;processed_time&quot;: 1.2345,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;229207&quot;,
+    &quot;name&quot;: &quot;fyp&quot;,
+    &quot;description&quot;: &quot;&quot;,
+    &quot;stats&quot;: {
+      &quot;video_count&quot;: 1000000,
+      &quot;view_count&quot;: 50000000000
+    },
+    &quot;url&quot;: &quot;https://www.tiktok.com/tag/fyp&quot;
+  }
+}</code></pre></div>
+<h2 id="field">Field data<a class="anchor" href="#field" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="tbl "><table><thead><tr><th>Field</th><th>Tipe</th><th>Keterangan</th></tr></thead><tbody><tr><td><code>id</code></td><td>string</td><td>ID hashtag</td></tr><tr><td><code>name</code></td><td>string</td><td>Nama hashtag</td></tr><tr><td><code>description</code></td><td>string</td><td>Deskripsi, kosong bila tidak ada</td></tr><tr><td><code>stats.video_count</code></td><td>number</td><td>Jumlah video yang memakai hashtag</td></tr><tr><td><code>stats.view_count</code></td><td>number</td><td>Total views</td></tr><tr><td><code>url</code></td><td>string</td><td>Link hashtag di TikTok</td></tr></tbody></table></div>
+<h2 id="sumber">Sumber Data dan Batasan<a class="anchor" href="#sumber" aria-label="Tautan ke bagian ini">#</a></h2>
+<ul><li>Angka berasal dari halaman <code>tiktok.com/tag/nama</code> pada saat request. Nilainya bisa berbeda dengan yang tampil di aplikasi TikTok atau pada waktu lain, karena TikTok memperbarui dan membulatkan statistik dengan caranya sendiri</li><li>Angka yang tidak tersedia ditulis <code>0</code></li><li>Struktur halaman TikTok dapat berubah dan TikTok dapat menampilkan captcha ke server. Request bisa gagal sewaktu-waktu</li><li>Statistik lain seperti tren harian atau daftar video tidak tersedia</li></ul>
+<h2 id="error">Response Error<a class="anchor" href="#error" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="code"><div class="code-head"><span class="code-lang">404</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="json">{
+  &quot;code&quot;: -1,
+  &quot;msg&quot;: &quot;Hashtag tidak ditemukan&quot;
+}</code></pre></div>
+<div class="tbl "><table><thead><tr><th>Status</th><th>msg</th><th>Penyebab</th></tr></thead><tbody><tr><td><code>404</code></td><td><code>Nama hashtag wajib diisi</code></td><td>Parameter kosong</td></tr><tr><td><code>404</code></td><td><code>Nama hashtag tidak valid</code></td><td>Format nama salah</td></tr><tr><td><code>404</code></td><td><code>Hashtag tidak ditemukan</code></td><td>TikTok menyatakan hashtag tidak ada</td></tr><tr><td><code>502</code></td><td><code>TikTok meminta verifikasi (captcha) untuk server ini, coba lagi nanti</code></td><td>Server ditantang captcha oleh TikTok</td></tr><tr><td><code>502</code></td><td><code>Data tidak ditemukan di halaman TikTok</code></td><td>Halaman terbuka tetapi data hashtag tidak ada</td></tr><tr><td><code>504</code></td><td><code>Permintaan terlalu lama, coba lagi.</code></td><td>Proses melebihi 28 detik</td></tr><tr><td><code>429</code></td><td><code>Terlalu banyak permintaan. Coba lagi sebentar lagi.</code></td><td>Melewati batas request, lihat <a href="/docs/rate-limits/">Rate Limit</a></td></tr><tr><td><code>405</code></td><td><code>Metode tidak diizinkan.</code></td><td>Metode selain GET, HEAD, atau OPTIONS</td></tr><tr><td><code>414</code></td><td><code>URL terlalu panjang.</code></td><td>Panjang URL request lebih dari 2500 karakter</td></tr></tbody></table></div>
+      <div class="pager">
+        <a class="pager-a" href="/docs/tiktok/profile/"><small>Sebelumnya</small><b>Profil TikTok</b></a>
+        <a class="pager-a pager-next" href="/docs/utility/health/"><small>Berikutnya</small><b>Health Check</b></a>
+      </div>
+    </article>
+  </main>
+  <aside class="dx-toc" aria-label="Daftar isi">
+    <div class="dx-toc-in"><b>DI HALAMAN INI</b><ul><li><a href="#parameter">Parameter</a></li><li><a href="#request">Contoh Request</a></li><li><a href="#sukses">Response Sukses</a></li><li><a href="#field">Field data</a></li><li><a href="#sumber">Sumber Data dan Batasan</a></li><li><a href="#error">Response Error</a></li></ul></div>
+  </aside>
+</div>
+<footer>
+  <span>© 2026 Tikobox</span>
+  <span>Dokumentasi API</span>
+</footer>
+<script src="/assets/js/docs.js" defer></script>
+</body>
+</html>

@@ -40,8 +40,8 @@ async function lookup(input: unknown, req: Request, res: Response) {
 
   try {
     const data = await downloadTikTok(url);
-    res.setHeader("cache-control", "no-store");
     if (res.headersSent) return; // sudah kena timeout 504
+    res.setHeader("cache-control", "no-store");
     res.json({ code: 0, msg: "success", processed_time: Number(((Date.now() - started) / 1000).toFixed(4)), data: toApiData(data) });
   } catch (error) {
     if (error instanceof SecurityError) {
@@ -154,6 +154,13 @@ router.get("/download", rateLimit({ name: "download", max: 60, windowMs: 60_000,
     res.setHeader("cache-control", "no-store");
     res.setHeader("x-content-type-options", "nosniff");
     res.setHeader("content-security-policy", "default-src 'none'; sandbox");
+
+    // HEAD hanya butuh header: hentikan upstream supaya file tidak ikut terunduh di server
+    if (req.method === "HEAD") {
+      await upstream.body.cancel().catch(() => {});
+      res.end();
+      return;
+    }
 
     await pipeline(Readable.fromWeb(upstream.body as any), res);
   } catch (error) {

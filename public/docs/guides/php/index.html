@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5ef">
+  <title>PHP - Tikobox Docs</title>
+  <meta name="description" content="Klien PHP dengan cURL dan retry 429">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://tikobox.vercel.app/docs/guides/php/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tikobox">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:title" content="PHP - Tikobox Docs">
+  <meta property="og:description" content="Klien PHP dengan cURL dan retry 429">
+  <meta property="og:url" content="https://tikobox.vercel.app/docs/guides/php/">
+  <meta property="og:image" content="https://tikobox.vercel.app/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="1200">
+  <meta property="og:image:alt" content="Logo Tikobox">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="PHP - Tikobox Docs">
+  <meta name="twitter:description" content="Klien PHP dengan cURL dan retry 429">
+  <meta name="twitter:image" content="https://tikobox.vercel.app/og-image.png">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/docs.css">
+  <meta name="monetag" content="cf97f76e709b8bde5c0e811e064a9711">
+</head>
+<body class="dx-body">
+<nav class="nav">
+  <a class="brand" href="/"><span>TIKO</span>BOX</a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a class="active" href="/docs/">Docs</a>
+  </div>
+</nav>
+<div class="dx-bar">
+  <button id="menuBtn" class="btn btn-sm" type="button" aria-expanded="false" aria-controls="side">MENU</button>
+  <button id="searchBtn" class="btn btn-sm btn-blue" type="button">CARI</button>
+  <span class="dx-crumb">Panduan</span>
+</div>
+<div class="dx">
+  <aside class="dx-side" id="side" aria-label="Navigasi dokumentasi">
+    <div class="dx-search">
+      <label class="sr" for="q">Cari dokumentasi</label>
+      <input id="q" type="search" placeholder="Cari dokumentasi" autocomplete="off" spellcheck="false">
+      <kbd aria-hidden="true">/</kbd>
+    </div>
+    <div id="results" class="dx-results" hidden></div>
+    <nav id="navlist"><div class="dx-group"><div class="dx-group-title">Mulai</div><a class="dx-link" href="/docs/">Beranda</a><a class="dx-link" href="/docs/getting-started/">Memulai</a><a class="dx-link" href="/docs/base-url/">Base URL</a><a class="dx-link" href="/docs/authentication/">Autentikasi</a><a class="dx-link" href="/docs/rate-limits/">Rate Limit</a><a class="dx-link" href="/docs/errors/">Penanganan Error</a><a class="dx-link" href="/docs/changelog/">Changelog</a></div><div class="dx-group"><div class="dx-group-title">Downloader</div><a class="dx-link" href="/docs/downloader/video/">Video Downloader</a><a class="dx-link" href="/docs/downloader/audio/">Audio Downloader</a><a class="dx-link" href="/docs/downloader/slideshow/">Slideshow Downloader</a><a class="dx-link" href="/docs/downloader/media-proxy/">Media Proxy</a></div><div class="dx-group"><div class="dx-group-title">TikTok</div><a class="dx-link" href="/docs/tiktok/profile/">Profil TikTok</a><a class="dx-link" href="/docs/tiktok/hashtag/">Hashtag TikTok</a></div><div class="dx-group"><div class="dx-group-title">Utility</div><a class="dx-link" href="/docs/utility/health/">Health Check</a><a class="dx-link" href="/docs/utility/info/">API Info</a></div><div class="dx-group"><div class="dx-group-title">Panduan</div><a class="dx-link" href="/docs/guides/curl/">cURL</a><a class="dx-link" href="/docs/guides/javascript/">JavaScript</a><a class="dx-link" href="/docs/guides/nodejs/">Node.js</a><a class="dx-link" href="/docs/guides/python/">Python</a><a class="dx-link on" href="/docs/guides/php/" aria-current="page">PHP</a><a class="dx-link" href="/docs/guides/web/">Aplikasi Web</a></div><div class="dx-group"><div class="dx-group-title">Referensi</div><a class="dx-link" href="/docs/reference/response-format/">Format Response</a><a class="dx-link" href="/docs/reference/status-codes/">Status Code</a><a class="dx-link" href="/docs/reference/security/">Keamanan dan Batasan</a><a class="dx-link" href="/docs/reference/not-available/">Belum Tersedia</a><a class="dx-link" href="/docs/reference/faq/">FAQ</a></div></nav>
+  </aside>
+  <div class="dx-overlay" id="overlay" hidden></div>
+  <main class="dx-main">
+    <article class="doc-content">
+      <div class="badge">PANDUAN</div>
+      <h1>PHP</h1>
+      <p class="lead">Klien PHP dengan cURL dan retry 429</p>
+      <details class="toc-inline"><summary>Di halaman ini</summary><ul><li><a href="#kode">Klien Lengkap</a></li><li><a href="#catatan">Catatan</a></li></ul></details>
+      <p>Memakai ekstensi cURL bawaan PHP 7.4 ke atas, tanpa library tambahan</p>
+<h2 id="kode">Klien Lengkap<a class="anchor" href="#kode" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="code"><div class="code-head"><span class="code-lang">client.php</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="php">&lt;?php
+// Butuh: PHP 7.4+ dengan ekstensi curl dan json
+
+const BASE = &quot;https://tikobox.my.id&quot;;
+const UA = &quot;MyTikoboxClient/1.0&quot;;
+
+function tikobox_api(string $path, array $params = [], int $retries = 2): array
+{
+    $url = BASE . $path . ($params ? &quot;?&quot; . http_build_query($params) : &quot;&quot;);
+
+    for ($attempt = 0; ; $attempt++) {
+        $retryAfter = 5;
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER =&gt; true,
+            CURLOPT_TIMEOUT =&gt; 35,
+            CURLOPT_USERAGENT =&gt; UA,
+            CURLOPT_HEADERFUNCTION =&gt; function ($ch, $line) use (&amp;$retryAfter) {
+                if (stripos($line, &quot;retry-after:&quot;) === 0) {
+                    $retryAfter = max(1, (int) trim(substr($line, 12)));
+                }
+                return strlen($line);
+            },
+        ]);
+
+        $body = curl_exec($ch);
+        if ($body === false) {
+            throw new RuntimeException(curl_error($ch));
+        }
+        $status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+
+        // 429: tunggu sesuai header retry-after lalu ulangi
+        if ($status === 429 &amp;&amp; $attempt &lt; $retries) {
+            sleep($retryAfter);
+            continue;
+        }
+
+        $json = json_decode($body, true) ?? [&quot;code&quot; =&gt; -1, &quot;msg&quot; =&gt; &quot;HTTP $status&quot;];
+        if (($json[&quot;code&quot;] ?? -1) !== 0) {
+            throw new RuntimeException($status . &quot; &quot; . ($json[&quot;msg&quot;] ?? &quot;error&quot;));
+        }
+        return $json[&quot;data&quot;];
+    }
+}
+
+function tikobox_save(string $mediaUrl, string $file, string $cookie = &quot;&quot;): void
+{
+    $params = [&quot;url&quot; =&gt; $mediaUrl, &quot;name&quot; =&gt; $file];
+    if ($cookie !== &quot;&quot;) {
+        $params[&quot;c&quot;] = $cookie;
+    }
+
+    $fh = fopen($file, &quot;wb&quot;);
+    $ch = curl_init(BASE . &quot;/api/download?&quot; . http_build_query($params));
+    curl_setopt_array($ch, [
+        CURLOPT_FILE =&gt; $fh,
+        CURLOPT_TIMEOUT =&gt; 0,
+        CURLOPT_USERAGENT =&gt; UA,
+    ]);
+
+    $ok = curl_exec($ch);
+    $status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    fclose($fh);
+
+    if ($ok === false || $status !== 200) {
+        $message = $ok === false ? curl_error($ch) : &quot;HTTP $status&quot;;
+        unlink($file);
+        throw new RuntimeException($message);
+    }
+    echo &quot;tersimpan: $file\n&quot;;
+}
+
+// Contoh pemakaian
+$video = tikobox_api(&quot;/api/tiktok&quot;, [&quot;url&quot; =&gt; &quot;https://vt.tiktok.com/ZSxxxxxxx/&quot;]);
+$cookie = $video[&quot;cookie&quot;] ?? &quot;&quot;;
+
+if (!empty($video[&quot;images&quot;])) {
+    foreach ($video[&quot;images&quot;] as $i =&gt; $image) {
+        tikobox_save($image, $video[&quot;id&quot;] . &quot;-&quot; . ($i + 1) . &quot;.jpg&quot;, $cookie);
+    }
+} else {
+    tikobox_save($video[&quot;play&quot;], $video[&quot;id&quot;] . &quot;.mp4&quot;, $cookie);
+}
+if ($video[&quot;music&quot;] !== &quot;&quot;) {
+    tikobox_save($video[&quot;music&quot;], $video[&quot;id&quot;] . &quot;.mp3&quot;, $cookie);
+}
+
+print_r(tikobox_api(&quot;/api/user&quot;, [&quot;unique_id&quot; =&gt; &quot;tiktok&quot;]));
+print_r(tikobox_api(&quot;/api/hashtag&quot;, [&quot;name&quot; =&gt; &quot;fyp&quot;]));</code></pre></div>
+<div class="code"><div class="code-head"><span class="code-lang">Menjalankan</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="bash">php client.php</code></pre></div>
+<h2 id="catatan">Catatan<a class="anchor" href="#catatan" aria-label="Tautan ke bagian ini">#</a></h2>
+<ul><li><code>http_build_query</code> meng-encode parameter dengan benar</li><li><code>tikobox_save()</code> menulis langsung ke file dan menghapusnya bila status bukan 200</li><li>Hasil <code>json_decode</code> dengan argumen <code>true</code> berupa array asosiatif</li></ul>
+      <div class="pager">
+        <a class="pager-a" href="/docs/guides/python/"><small>Sebelumnya</small><b>Python</b></a>
+        <a class="pager-a pager-next" href="/docs/guides/web/"><small>Berikutnya</small><b>Aplikasi Web</b></a>
+      </div>
+    </article>
+  </main>
+  <aside class="dx-toc" aria-label="Daftar isi">
+    <div class="dx-toc-in"><b>DI HALAMAN INI</b><ul><li><a href="#kode">Klien Lengkap</a></li><li><a href="#catatan">Catatan</a></li></ul></div>
+  </aside>
+</div>
+<footer>
+  <span>© 2026 Tikobox</span>
+  <span>Dokumentasi API</span>
+</footer>
+<script src="/assets/js/docs.js" defer></script>
+</body>
+</html>

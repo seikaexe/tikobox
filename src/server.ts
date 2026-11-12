@@ -42,7 +42,7 @@ const sendPage = (file: string): RequestHandler => (_req, res) => {
 };
 app.use(express.static(publicDir));
 app.get("/", sendPage("index.html"));
-app.get("/docs", sendPage("docs.html"));
+app.get("/docs", sendPage("docs/index.html"));
 
 app.use((_req, res) => {
   res.status(404).type("text/plain").send("Halaman tidak ditemukan.");

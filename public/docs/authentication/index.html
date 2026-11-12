@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5ef">
+  <title>Autentikasi - Tikobox Docs</title>
+  <meta name="description" content="API publik tanpa API key">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://tikobox.vercel.app/docs/authentication/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tikobox">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:title" content="Autentikasi - Tikobox Docs">
+  <meta property="og:description" content="API publik tanpa API key">
+  <meta property="og:url" content="https://tikobox.vercel.app/docs/authentication/">
+  <meta property="og:image" content="https://tikobox.vercel.app/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="1200">
+  <meta property="og:image:alt" content="Logo Tikobox">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Autentikasi - Tikobox Docs">
+  <meta name="twitter:description" content="API publik tanpa API key">
+  <meta name="twitter:image" content="https://tikobox.vercel.app/og-image.png">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/docs.css">
+  <meta name="monetag" content="cf97f76e709b8bde5c0e811e064a9711">
+</head>
+<body class="dx-body">
+<nav class="nav">
+  <a class="brand" href="/"><span>TIKO</span>BOX</a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a class="active" href="/docs/">Docs</a>
+  </div>
+</nav>
+<div class="dx-bar">
+  <button id="menuBtn" class="btn btn-sm" type="button" aria-expanded="false" aria-controls="side">MENU</button>
+  <button id="searchBtn" class="btn btn-sm btn-blue" type="button">CARI</button>
+  <span class="dx-crumb">Mulai</span>
+</div>
+<div class="dx">
+  <aside class="dx-side" id="side" aria-label="Navigasi dokumentasi">
+    <div class="dx-search">
+      <label class="sr" for="q">Cari dokumentasi</label>
+      <input id="q" type="search" placeholder="Cari dokumentasi" autocomplete="off" spellcheck="false">
+      <kbd aria-hidden="true">/</kbd>
+    </div>
+    <div id="results" class="dx-results" hidden></div>
+    <nav id="navlist"><div class="dx-group"><div class="dx-group-title">Mulai</div><a class="dx-link" href="/docs/">Beranda</a><a class="dx-link" href="/docs/getting-started/">Memulai</a><a class="dx-link" href="/docs/base-url/">Base URL</a><a class="dx-link on" href="/docs/authentication/" aria-current="page">Autentikasi</a><a class="dx-link" href="/docs/rate-limits/">Rate Limit</a><a class="dx-link" href="/docs/errors/">Penanganan Error</a><a class="dx-link" href="/docs/changelog/">Changelog</a></div><div class="dx-group"><div class="dx-group-title">Downloader</div><a class="dx-link" href="/docs/downloader/video/">Video Downloader</a><a class="dx-link" href="/docs/downloader/audio/">Audio Downloader</a><a class="dx-link" href="/docs/downloader/slideshow/">Slideshow Downloader</a><a class="dx-link" href="/docs/downloader/media-proxy/">Media Proxy</a></div><div class="dx-group"><div class="dx-group-title">TikTok</div><a class="dx-link" href="/docs/tiktok/profile/">Profil TikTok</a><a class="dx-link" href="/docs/tiktok/hashtag/">Hashtag TikTok</a></div><div class="dx-group"><div class="dx-group-title">Utility</div><a class="dx-link" href="/docs/utility/health/">Health Check</a><a class="dx-link" href="/docs/utility/info/">API Info</a></div><div class="dx-group"><div class="dx-group-title">Panduan</div><a class="dx-link" href="/docs/guides/curl/">cURL</a><a class="dx-link" href="/docs/guides/javascript/">JavaScript</a><a class="dx-link" href="/docs/guides/nodejs/">Node.js</a><a class="dx-link" href="/docs/guides/python/">Python</a><a class="dx-link" href="/docs/guides/php/">PHP</a><a class="dx-link" href="/docs/guides/web/">Aplikasi Web</a></div><div class="dx-group"><div class="dx-group-title">Referensi</div><a class="dx-link" href="/docs/reference/response-format/">Format Response</a><a class="dx-link" href="/docs/reference/status-codes/">Status Code</a><a class="dx-link" href="/docs/reference/security/">Keamanan dan Batasan</a><a class="dx-link" href="/docs/reference/not-available/">Belum Tersedia</a><a class="dx-link" href="/docs/reference/faq/">FAQ</a></div></nav>
+  </aside>
+  <div class="dx-overlay" id="overlay" hidden></div>
+  <main class="dx-main">
+    <article class="doc-content">
+      <div class="badge">MULAI</div>
+      <h1>Autentikasi</h1>
+      <p class="lead">API publik tanpa API key</p>
+      <details class="toc-inline"><summary>Di halaman ini</summary><ul><li><a href="#identifikasi">Identifikasi Klien</a></li><li><a href="#penggunaan-browser">Penggunaan dari Browser</a></li></ul></details>
+      <p>Saat ini API tidak memakai autentikasi. Tidak ada API key, token, atau header <code>Authorization</code> yang perlu dikirim</p>
+<h2 id="identifikasi">Identifikasi Klien<a class="anchor" href="#identifikasi" aria-label="Tautan ke bagian ini">#</a></h2>
+<p>Karena tanpa API key, pembatasan request dilakukan per alamat IP. Server juga membaca header <code>User-Agent</code> untuk membedakan klien otomatis dari browser, lihat <a href="/docs/rate-limits/#klien-otomatis">Rate Limit</a></p>
+<p>Kirim <code>User-Agent</code> yang menjelaskan aplikasi kamu, misalnya:</p>
+<div class="code"><div class="code-head"><span class="code-lang">Header</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="http">User-Agent: MyTikoboxClient/1.0</code></pre></div>
+<h2 id="penggunaan-browser">Penggunaan dari Browser<a class="anchor" href="#penggunaan-browser" aria-label="Tautan ke bagian ini">#</a></h2>
+<p>Response API tidak menyertakan header CORS. Browser di domain lain tidak bisa membaca response <code>fetch</code> ke API ini. Panggil API dari server kamu (backend), lalu teruskan hasilnya ke frontend</p>
+<div class="note note-warn">Jangan menaruh kunci atau rahasia di request. API ini tidak membutuhkannya</div>
+      <div class="pager">
+        <a class="pager-a" href="/docs/base-url/"><small>Sebelumnya</small><b>Base URL</b></a>
+        <a class="pager-a pager-next" href="/docs/rate-limits/"><small>Berikutnya</small><b>Rate Limit</b></a>
+      </div>
+    </article>
+  </main>
+  <aside class="dx-toc" aria-label="Daftar isi">
+    <div class="dx-toc-in"><b>DI HALAMAN INI</b><ul><li><a href="#identifikasi">Identifikasi Klien</a></li><li><a href="#penggunaan-browser">Penggunaan dari Browser</a></li></ul></div>
+  </aside>
+</div>
+<footer>
+  <span>© 2026 Tikobox</span>
+  <span>Dokumentasi API</span>
+</footer>
+<script src="/assets/js/docs.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5ef">
+  <title>Video Downloader - Tikobox Docs</title>
+  <meta name="description" content="Ambil info dan URL video TikTok tanpa watermark">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://tikobox.vercel.app/docs/downloader/video/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tikobox">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:title" content="Video Downloader - Tikobox Docs">
+  <meta property="og:description" content="Ambil info dan URL video TikTok tanpa watermark">
+  <meta property="og:url" content="https://tikobox.vercel.app/docs/downloader/video/">
+  <meta property="og:image" content="https://tikobox.vercel.app/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="1200">
+  <meta property="og:image:alt" content="Logo Tikobox">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Video Downloader - Tikobox Docs">
+  <meta name="twitter:description" content="Ambil info dan URL video TikTok tanpa watermark">
+  <meta name="twitter:image" content="https://tikobox.vercel.app/og-image.png">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/docs.css">
+  <meta name="monetag" content="cf97f76e709b8bde5c0e811e064a9711">
+</head>
+<body class="dx-body">
+<nav class="nav">
+  <a class="brand" href="/"><span>TIKO</span>BOX</a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a class="active" href="/docs/">Docs</a>
+  </div>
+</nav>
+<div class="dx-bar">
+  <button id="menuBtn" class="btn btn-sm" type="button" aria-expanded="false" aria-controls="side">MENU</button>
+  <button id="searchBtn" class="btn btn-sm btn-blue" type="button">CARI</button>
+  <span class="dx-crumb">Downloader</span>
+</div>
+<div class="dx">
+  <aside class="dx-side" id="side" aria-label="Navigasi dokumentasi">
+    <div class="dx-search">
+      <label class="sr" for="q">Cari dokumentasi</label>
+      <input id="q" type="search" placeholder="Cari dokumentasi" autocomplete="off" spellcheck="false">
+      <kbd aria-hidden="true">/</kbd>
+    </div>
+    <div id="results" class="dx-results" hidden></div>
+    <nav id="navlist"><div class="dx-group"><div class="dx-group-title">Mulai</div><a class="dx-link" href="/docs/">Beranda</a><a class="dx-link" href="/docs/getting-started/">Memulai</a><a class="dx-link" href="/docs/base-url/">Base URL</a><a class="dx-link" href="/docs/authentication/">Autentikasi</a><a class="dx-link" href="/docs/rate-limits/">Rate Limit</a><a class="dx-link" href="/docs/errors/">Penanganan Error</a><a class="dx-link" href="/docs/changelog/">Changelog</a></div><div class="dx-group"><div class="dx-group-title">Downloader</div><a class="dx-link on" href="/docs/downloader/video/" aria-current="page">Video Downloader</a><a class="dx-link" href="/docs/downloader/audio/">Audio Downloader</a><a class="dx-link" href="/docs/downloader/slideshow/">Slideshow Downloader</a><a class="dx-link" href="/docs/downloader/media-proxy/">Media Proxy</a></div><div class="dx-group"><div class="dx-group-title">TikTok</div><a class="dx-link" href="/docs/tiktok/profile/">Profil TikTok</a><a class="dx-link" href="/docs/tiktok/hashtag/">Hashtag TikTok</a></div><div class="dx-group"><div class="dx-group-title">Utility</div><a class="dx-link" href="/docs/utility/health/">Health Check</a><a class="dx-link" href="/docs/utility/info/">API Info</a></div><div class="dx-group"><div class="dx-group-title">Panduan</div><a class="dx-link" href="/docs/guides/curl/">cURL</a><a class="dx-link" href="/docs/guides/javascript/">JavaScript</a><a class="dx-link" href="/docs/guides/nodejs/">Node.js</a><a class="dx-link" href="/docs/guides/python/">Python</a><a class="dx-link" href="/docs/guides/php/">PHP</a><a class="dx-link" href="/docs/guides/web/">Aplikasi Web</a></div><div class="dx-group"><div class="dx-group-title">Referensi</div><a class="dx-link" href="/docs/reference/response-format/">Format Response</a><a class="dx-link" href="/docs/reference/status-codes/">Status Code</a><a class="dx-link" href="/docs/reference/security/">Keamanan dan Batasan</a><a class="dx-link" href="/docs/reference/not-available/">Belum Tersedia</a><a class="dx-link" href="/docs/reference/faq/">FAQ</a></div></nav>
+  </aside>
+  <div class="dx-overlay" id="overlay" hidden></div>
+  <main class="dx-main">
+    <article class="doc-content">
+      <div class="badge">DOWNLOADER</div>
+      <h1>Video Downloader</h1>
+      <p class="lead">Ambil info dan URL video TikTok tanpa watermark</p>
+      <details class="toc-inline"><summary>Di halaman ini</summary><ul><li><a href="#parameter">Parameter Query</a></li><li><a href="#link">Link yang Didukung</a></li><li><a href="#request">Contoh Request</a></li><li><a href="#sukses">Response Sukses</a></li><li><a href="#error">Response Error</a></li><li><a href="#bentuk-singkat">Bentuk Singkat</a></li><li><a href="#catatan">Catatan</a></li></ul></details>
+      <div class="ep"><span class="m m-get">GET</span><code class="ep-path">/api/tiktok</code></div>
+<p>Mengambil data satu link TikTok: URL video (tanpa watermark, watermark, HD), cover, statistik, penulis, dan musik. Link foto dan slideshow memakai endpoint yang sama, lihat <a href="/docs/downloader/slideshow/">Slideshow</a></p>
+<h2 id="parameter">Parameter Query<a class="anchor" href="#parameter" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="tbl "><table><thead><tr><th>Parameter</th><th>Tipe</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td><code>url</code></td><td><code class="nw">string</code></td><td><span class="req">wajib</span></td><td>Link TikTok. Boleh tanpa <code>https://</code> dan boleh ada teks lain di sekitarnya, link pertama akan diambil</td></tr></tbody></table></div>
+<h2 id="link">Link yang Didukung<a class="anchor" href="#link" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="tbl "><table><thead><tr><th>Host</th><th>Contoh</th></tr></thead><tbody><tr><td><code>tiktok.com</code></td><td><code>https://www.tiktok.com/@user/video/7300000000000000000</code></td></tr><tr><td><code>vt.tiktok.com</code></td><td><code>https://vt.tiktok.com/ZSxxxxxxx/</code></td></tr><tr><td><code>vm.tiktok.com</code></td><td><code>https://vm.tiktok.com/ZSxxxxxxx/</code></td></tr><tr><td><code>tt.site</code>, <code>www.tt.site</code></td><td><code>https://www.tt.site/t/xxxx</code></td></tr></tbody></table></div>
+<ul><li>Subdomain <code>*.tiktok.com</code> dan <code>m.tiktok.com</code> juga diterima</li><li>Link dengan username dan password (<code>user:pass@host</code>) atau port eksplisit ditolak</li><li>Panjang link maksimal 500 karakter</li></ul>
+<h2 id="request">Contoh Request<a class="anchor" href="#request" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="tabs"><div class="tab-list" role="tablist"><button class="tab on" type="button" role="tab" data-tab="curl" aria-selected="true">cURL</button><button class="tab" type="button" role="tab" data-tab="fetch" aria-selected="false">Fetch</button><button class="tab" type="button" role="tab" data-tab="node" aria-selected="false">Node.js</button><button class="tab" type="button" role="tab" data-tab="python" aria-selected="false">Python</button><button class="tab" type="button" role="tab" data-tab="php" aria-selected="false">PHP</button></div><div class="tab-panel on" role="tabpanel" data-panel="curl"><div class="code"><div class="code-head"><span class="code-lang">cURL</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="bash">curl -sS -G &quot;https://tikobox.my.id/api/tiktok&quot; \
+  -A &quot;MyTikoboxClient/1.0&quot; \
+  --data-urlencode &quot;url=https://vt.tiktok.com/ZSxxxxxxx/&quot;</code></pre></div></div><div class="tab-panel" role="tabpanel" data-panel="fetch"><div class="code"><div class="code-head"><span class="code-lang">Fetch</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="js">const url = new URL(&quot;https://tikobox.my.id/api/tiktok&quot;)
+url.searchParams.set(&quot;url&quot;, &quot;https://vt.tiktok.com/ZSxxxxxxx/&quot;)
+
+const res = await fetch(url)
+const json = await res.json()
+
+if (json.code !== 0) throw new Error(`${res.status} ${json.msg}`)
+console.log(json.data)</code></pre></div></div><div class="tab-panel" role="tabpanel" data-panel="node"><div class="code"><div class="code-head"><span class="code-lang">Node.js</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="js">const url = new URL(&quot;https://tikobox.my.id/api/tiktok&quot;)
+url.searchParams.set(&quot;url&quot;, &quot;https://vt.tiktok.com/ZSxxxxxxx/&quot;)
+
+const res = await fetch(url, { headers: { &quot;User-Agent&quot;: &quot;MyTikoboxClient/1.0&quot; } })
+const json = await res.json()
+
+if (json.code !== 0) throw new Error(`${res.status} ${json.msg}`)
+console.log(json.data)</code></pre></div></div><div class="tab-panel" role="tabpanel" data-panel="python"><div class="code"><div class="code-head"><span class="code-lang">Python</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="python">import requests
+
+res = requests.get(
+    &quot;https://tikobox.my.id/api/tiktok&quot;,
+    params={
+        &quot;url&quot;: &quot;https://vt.tiktok.com/ZSxxxxxxx/&quot;,
+    },
+    headers={&quot;User-Agent&quot;: &quot;MyTikoboxClient/1.0&quot;},
+    timeout=35,
+)
+
+data = res.json()
+
+if data[&quot;code&quot;] != 0:
+    raise RuntimeError(f'{res.status_code} {data[&quot;msg&quot;]}')
+
+print(data[&quot;data&quot;])</code></pre></div></div><div class="tab-panel" role="tabpanel" data-panel="php"><div class="code"><div class="code-head"><span class="code-lang">PHP</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="php">&lt;?php
+
+$query = http_build_query([
+    &quot;url&quot; =&gt; &quot;https://vt.tiktok.com/ZSxxxxxxx/&quot;,
+]);
+
+$ch = curl_init(&quot;https://tikobox.my.id/api/tiktok&quot; . &quot;?&quot; . $query);
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER =&gt; true,
+    CURLOPT_TIMEOUT =&gt; 35,
+    CURLOPT_USERAGENT =&gt; &quot;MyTikoboxClient/1.0&quot;,
+]);
+
+$body = curl_exec($ch);
+if ($body === false) {
+    throw new RuntimeException(curl_error($ch));
+}
+
+$status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+$json = json_decode($body, true);
+
+if (($json[&quot;code&quot;] ?? -1) !== 0) {
+    throw new RuntimeException($status . &quot; &quot; . ($json[&quot;msg&quot;] ?? &quot;error&quot;));
+}
+
+print_r($json[&quot;data&quot;]);</code></pre></div></div></div>
+<h2 id="sukses">Response Sukses<a class="anchor" href="#sukses" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="note note-info">Nilai pada contoh response bersifat ilustrasi, bukan data nyata</div>
+<div class="code"><div class="code-head"><span class="code-lang">200</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="json">{
+  &quot;code&quot;: 0,
+  &quot;msg&quot;: &quot;success&quot;,
+  &quot;processed_time&quot;: 1.2345,
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;7300000000000000000&quot;,
+    &quot;region&quot;: &quot;ID&quot;,
+    &quot;title&quot;: &quot;Contoh judul video&quot;,
+    &quot;cover&quot;: &quot;https://p16-sign.tiktokcdn.com/xxxx/cover.jpeg&quot;,
+    &quot;origin_cover&quot;: &quot;https://p16-sign.tiktokcdn.com/xxxx/origin.jpeg&quot;,
+    &quot;duration&quot;: 15,
+    &quot;play&quot;: &quot;https://v16m.tiktokcdn.com/xxxx/video.mp4&quot;,
+    &quot;wmplay&quot;: &quot;https://v16m.tiktokcdn.com/xxxx/video-wm.mp4&quot;,
+    &quot;hdplay&quot;: &quot;https://v16m.tiktokcdn.com/xxxx/video-hd.mp4&quot;,
+    &quot;size&quot;: 1048576,
+    &quot;wm_size&quot;: 1048576,
+    &quot;hd_size&quot;: 2097152,
+    &quot;music&quot;: &quot;https://sf16.tiktokcdn.com/xxxx/music.mp3&quot;,
+    &quot;music_info&quot;: {
+      &quot;id&quot;: &quot;7200000000000000000&quot;,
+      &quot;title&quot;: &quot;original sound&quot;,
+      &quot;play&quot;: &quot;https://sf16.tiktokcdn.com/xxxx/music.mp3&quot;,
+      &quot;cover&quot;: &quot;https://p16-sign.tiktokcdn.com/xxxx/music-cover.jpeg&quot;,
+      &quot;author&quot;: &quot;username&quot;,
+      &quot;original&quot;: true,
+      &quot;duration&quot;: 15,
+      &quot;album&quot;: &quot;&quot;
+    },
+    &quot;play_count&quot;: 1000,
+    &quot;digg_count&quot;: 100,
+    &quot;comment_count&quot;: 10,
+    &quot;share_count&quot;: 5,
+    &quot;download_count&quot;: 0,
+    &quot;collect_count&quot;: 3,
+    &quot;create_time&quot;: 1700000000,
+    &quot;author&quot;: {
+      &quot;id&quot;: &quot;6800000000000000000&quot;,
+      &quot;unique_id&quot;: &quot;username&quot;,
+      &quot;nickname&quot;: &quot;Nama Akun&quot;,
+      &quot;avatar&quot;: &quot;https://p16-sign.tiktokcdn.com/xxxx/avatar.jpeg&quot;
+    },
+    &quot;cookie&quot;: &quot;ttwid=xxxx&quot;
+  }
+}</code></pre></div>
+<h3>Field data</h3>
+<div class="tbl "><table><thead><tr><th>Field</th><th>Tipe</th><th>Keterangan</th></tr></thead><tbody><tr><td><code>id</code></td><td>string</td><td>ID video</td></tr><tr><td><code>region</code></td><td>string</td><td>Kode wilayah pembuatan, kosong bila tidak ada</td></tr><tr><td><code>title</code></td><td>string</td><td>Caption video</td></tr><tr><td><code>cover</code></td><td>string</td><td>URL gambar cover</td></tr><tr><td><code>origin_cover</code></td><td>string</td><td>URL cover asli</td></tr><tr><td><code>duration</code></td><td>number</td><td>Durasi, 0 bila tidak tersedia</td></tr><tr><td><code>play</code></td><td>string</td><td>URL MP4 tanpa watermark (kualitas standar)</td></tr><tr><td><code>wmplay</code></td><td>string</td><td>URL MP4 dengan watermark. Sama dengan <code>play</code> bila versi watermark tidak ada</td></tr><tr><td><code>hdplay</code></td><td>string</td><td>URL MP4 HD. Sama dengan <code>play</code> bila HD tidak ada</td></tr><tr><td><code>size</code></td><td>number</td><td>Ukuran <code>play</code> dalam byte, 0 bila tidak diketahui</td></tr><tr><td><code>wm_size</code></td><td>number</td><td>Ukuran <code>wmplay</code> dalam byte</td></tr><tr><td><code>hd_size</code></td><td>number</td><td>Ukuran <code>hdplay</code> dalam byte</td></tr><tr><td><code>create_time</code></td><td>number</td><td>Waktu posting, Unix timestamp</td></tr><tr><td><code>author</code></td><td>object</td><td><code>id</code>, <code>unique_id</code>, <code>nickname</code>, <code>avatar</code></td></tr><tr><td><code>cookie</code></td><td>string</td><td>Hanya ada bila TikTok memberi cookie sesi. Teruskan ke <code>/api/download</code> lewat parameter <code>c</code></td></tr></tbody></table></div>
+<p>Daftar lengkap termasuk <code>music_info</code>, statistik, dan <code>images</code> ada di <a href="/docs/reference/response-format/">Format Response</a></p>
+<h2 id="error">Response Error<a class="anchor" href="#error" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="code"><div class="code-head"><span class="code-lang">400</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="json">{
+  &quot;code&quot;: -1,
+  &quot;msg&quot;: &quot;Link TikTok tidak valid. Tempel link setelah /api/, contoh: /api/https://vt.tiktok.com/xxxx&quot;
+}</code></pre></div>
+<div class="tbl "><table><thead><tr><th>Status</th><th>msg</th><th>Penyebab</th></tr></thead><tbody><tr><td><code>400</code></td><td><code>Link TikTok tidak valid...</code></td><td>Parameter url kosong atau bukan link TikTok</td></tr><tr><td><code>502</code></td><td><code>Video tidak tersedia (privat, dihapus, atau dibatasi wilayah)</code></td><td>Video tidak bisa diakses</td></tr><tr><td><code>502</code></td><td><code>TikTok meminta verifikasi (captcha) untuk server ini, coba lagi nanti</code></td><td>Server ditantang captcha oleh TikTok</td></tr><tr><td><code>504</code></td><td><code>Permintaan terlalu lama, coba lagi.</code></td><td>Proses melebihi 28 detik</td></tr><tr><td><code>429</code></td><td><code>Terlalu banyak permintaan. Coba lagi sebentar lagi.</code></td><td>Melewati batas request, lihat <a href="/docs/rate-limits/">Rate Limit</a></td></tr><tr><td><code>405</code></td><td><code>Metode tidak diizinkan.</code></td><td>Metode selain GET, HEAD, atau OPTIONS</td></tr><tr><td><code>414</code></td><td><code>URL terlalu panjang.</code></td><td>Panjang URL request lebih dari 2500 karakter</td></tr></tbody></table></div>
+<h2 id="bentuk-singkat">Bentuk Singkat<a class="anchor" href="#bentuk-singkat" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="ep"><span class="m m-get">GET</span><code class="ep-path">/api/{link}</code></div>
+<p>Link bisa ditempel langsung setelah <code>/api/</code>. Hasilnya sama persis dengan <code>/api/tiktok</code>, begitu juga <code>/api/?url=LINK</code></p>
+<div class="code"><div class="code-head"><span class="code-lang">cURL</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="bash">curl -sS -A &quot;MyTikoboxClient/1.0&quot; &quot;https://tikobox.my.id/api/https://vt.tiktok.com/ZSxxxxxxx/&quot;</code></pre></div>
+<div class="note note-warn">Path yang tidak dikenali di bawah <code>/api/</code> diperlakukan sebagai link TikTok sehingga mengembalikan status 400 dengan pesan link tidak valid, bukan 404</div>
+<h2 id="catatan">Catatan<a class="anchor" href="#catatan" aria-label="Tautan ke bagian ini">#</a></h2>
+<ul><li>Data diambil langsung dari halaman TikTok. Video privat, dihapus, atau dibatasi wilayah tidak bisa diambil</li><li>URL media memiliki masa berlaku dari TikTok, unduh segera lewat <a href="/docs/downloader/media-proxy/">Media Proxy</a></li><li><code>download_count</code> selalu <code>0</code> karena tidak disediakan oleh sumber data</li><li>Response tidak di-cache (<code>cache-control: no-store</code>)</li><li>Batas waktu proses 28 detik</li></ul>
+      <div class="pager">
+        <a class="pager-a" href="/docs/changelog/"><small>Sebelumnya</small><b>Changelog</b></a>
+        <a class="pager-a pager-next" href="/docs/downloader/audio/"><small>Berikutnya</small><b>Audio Downloader</b></a>
+      </div>
+    </article>
+  </main>
+  <aside class="dx-toc" aria-label="Daftar isi">
+    <div class="dx-toc-in"><b>DI HALAMAN INI</b><ul><li><a href="#parameter">Parameter Query</a></li><li><a href="#link">Link yang Didukung</a></li><li><a href="#request">Contoh Request</a></li><li><a href="#sukses">Response Sukses</a></li><li><a href="#error">Response Error</a></li><li><a href="#bentuk-singkat">Bentuk Singkat</a></li><li><a href="#catatan">Catatan</a></li></ul></div>
+  </aside>
+</div>
+<footer>
+  <span>© 2026 Tikobox</span>
+  <span>Dokumentasi API</span>
+</footer>
+<script src="/assets/js/docs.js" defer></script>
+</body>
+</html>

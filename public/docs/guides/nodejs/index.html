@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5ef">
+  <title>Node.js - Tikobox Docs</title>
+  <meta name="description" content="Klien Node.js 18+ tanpa dependency, dengan retry 429">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://tikobox.vercel.app/docs/guides/nodejs/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tikobox">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:title" content="Node.js - Tikobox Docs">
+  <meta property="og:description" content="Klien Node.js 18+ tanpa dependency, dengan retry 429">
+  <meta property="og:url" content="https://tikobox.vercel.app/docs/guides/nodejs/">
+  <meta property="og:image" content="https://tikobox.vercel.app/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="1200">
+  <meta property="og:image:alt" content="Logo Tikobox">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Node.js - Tikobox Docs">
+  <meta name="twitter:description" content="Klien Node.js 18+ tanpa dependency, dengan retry 429">
+  <meta name="twitter:image" content="https://tikobox.vercel.app/og-image.png">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/docs.css">
+  <meta name="monetag" content="cf97f76e709b8bde5c0e811e064a9711">
+</head>
+<body class="dx-body">
+<nav class="nav">
+  <a class="brand" href="/"><span>TIKO</span>BOX</a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a class="active" href="/docs/">Docs</a>
+  </div>
+</nav>
+<div class="dx-bar">
+  <button id="menuBtn" class="btn btn-sm" type="button" aria-expanded="false" aria-controls="side">MENU</button>
+  <button id="searchBtn" class="btn btn-sm btn-blue" type="button">CARI</button>
+  <span class="dx-crumb">Panduan</span>
+</div>
+<div class="dx">
+  <aside class="dx-side" id="side" aria-label="Navigasi dokumentasi">
+    <div class="dx-search">
+      <label class="sr" for="q">Cari dokumentasi</label>
+      <input id="q" type="search" placeholder="Cari dokumentasi" autocomplete="off" spellcheck="false">
+      <kbd aria-hidden="true">/</kbd>
+    </div>
+    <div id="results" class="dx-results" hidden></div>
+    <nav id="navlist"><div class="dx-group"><div class="dx-group-title">Mulai</div><a class="dx-link" href="/docs/">Beranda</a><a class="dx-link" href="/docs/getting-started/">Memulai</a><a class="dx-link" href="/docs/base-url/">Base URL</a><a class="dx-link" href="/docs/authentication/">Autentikasi</a><a class="dx-link" href="/docs/rate-limits/">Rate Limit</a><a class="dx-link" href="/docs/errors/">Penanganan Error</a><a class="dx-link" href="/docs/changelog/">Changelog</a></div><div class="dx-group"><div class="dx-group-title">Downloader</div><a class="dx-link" href="/docs/downloader/video/">Video Downloader</a><a class="dx-link" href="/docs/downloader/audio/">Audio Downloader</a><a class="dx-link" href="/docs/downloader/slideshow/">Slideshow Downloader</a><a class="dx-link" href="/docs/downloader/media-proxy/">Media Proxy</a></div><div class="dx-group"><div class="dx-group-title">TikTok</div><a class="dx-link" href="/docs/tiktok/profile/">Profil TikTok</a><a class="dx-link" href="/docs/tiktok/hashtag/">Hashtag TikTok</a></div><div class="dx-group"><div class="dx-group-title">Utility</div><a class="dx-link" href="/docs/utility/health/">Health Check</a><a class="dx-link" href="/docs/utility/info/">API Info</a></div><div class="dx-group"><div class="dx-group-title">Panduan</div><a class="dx-link" href="/docs/guides/curl/">cURL</a><a class="dx-link" href="/docs/guides/javascript/">JavaScript</a><a class="dx-link on" href="/docs/guides/nodejs/" aria-current="page">Node.js</a><a class="dx-link" href="/docs/guides/python/">Python</a><a class="dx-link" href="/docs/guides/php/">PHP</a><a class="dx-link" href="/docs/guides/web/">Aplikasi Web</a></div><div class="dx-group"><div class="dx-group-title">Referensi</div><a class="dx-link" href="/docs/reference/response-format/">Format Response</a><a class="dx-link" href="/docs/reference/status-codes/">Status Code</a><a class="dx-link" href="/docs/reference/security/">Keamanan dan Batasan</a><a class="dx-link" href="/docs/reference/not-available/">Belum Tersedia</a><a class="dx-link" href="/docs/reference/faq/">FAQ</a></div></nav>
+  </aside>
+  <div class="dx-overlay" id="overlay" hidden></div>
+  <main class="dx-main">
+    <article class="doc-content">
+      <div class="badge">PANDUAN</div>
+      <h1>Node.js</h1>
+      <p class="lead">Klien Node.js 18+ tanpa dependency, dengan retry 429</p>
+      <details class="toc-inline"><summary>Di halaman ini</summary><ul><li><a href="#kode">Klien Lengkap</a></li><li><a href="#catatan">Catatan</a></li></ul></details>
+      <p>Memakai <code>fetch</code> bawaan Node.js 18 ke atas dan ES module (<code>.mjs</code>), tanpa dependency tambahan</p>
+<h2 id="kode">Klien Lengkap<a class="anchor" href="#kode" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="code"><div class="code-head"><span class="code-lang">client.mjs</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="js">// Node.js 18+ tanpa dependency. Jalankan: node client.mjs
+import { createWriteStream } from &quot;node:fs&quot;
+import { Readable } from &quot;node:stream&quot;
+import { pipeline } from &quot;node:stream/promises&quot;
+
+const BASE = &quot;https://tikobox.my.id&quot;
+const UA = &quot;MyTikoboxClient/1.0&quot;
+
+class TikoboxError extends Error {
+  constructor(message, status) {
+    super(message)
+    this.name = &quot;TikoboxError&quot;
+    this.status = status
+  }
+}
+
+const sleep = (ms) =&gt; new Promise((resolve) =&gt; setTimeout(resolve, ms))
+
+async function api(path, params = {}, retries = 2) {
+  const url = new URL(path, BASE)
+  for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value)
+
+  for (let attempt = 0; ; attempt++) {
+    const res = await fetch(url, {
+      headers: { &quot;User-Agent&quot;: UA },
+      signal: AbortSignal.timeout(35_000)
+    })
+    const json = await res.json().catch(() =&gt; ({ code: -1, msg: `HTTP ${res.status}` }))
+
+    // 429: tunggu sesuai header retry-after lalu ulangi
+    if (res.status === 429 &amp;&amp; attempt &lt; retries) {
+      await sleep((Number(res.headers.get(&quot;retry-after&quot;)) || 5) * 1000)
+      continue
+    }
+    if (json.code !== 0) throw new TikoboxError(json.msg, res.status)
+    return json.data
+  }
+}
+
+const getVideo = (link) =&gt; api(&quot;/api/tiktok&quot;, { url: link })
+const getProfile = (username) =&gt; api(&quot;/api/user&quot;, { unique_id: username })
+const getHashtag = (name) =&gt; api(&quot;/api/hashtag&quot;, { name })
+
+async function saveMedia(mediaUrl, file, cookie = &quot;&quot;) {
+  const url = new URL(&quot;/api/download&quot;, BASE)
+  url.searchParams.set(&quot;url&quot;, mediaUrl)
+  url.searchParams.set(&quot;name&quot;, file)
+  if (cookie) url.searchParams.set(&quot;c&quot;, cookie)
+
+  const res = await fetch(url, { headers: { &quot;User-Agent&quot;: UA } })
+  if (!res.ok) throw new TikoboxError((await res.json()).msg, res.status)
+
+  await pipeline(Readable.fromWeb(res.body), createWriteStream(file))
+  console.log(&quot;tersimpan:&quot;, file)
+}
+
+// Contoh pemakaian
+const video = await getVideo(&quot;https://vt.tiktok.com/ZSxxxxxxx/&quot;)
+
+if (video.images) {
+  for (const [i, image] of video.images.entries()) {
+    await saveMedia(image, `${video.id}-${i + 1}.jpg`, video.cookie)
+  }
+} else {
+  await saveMedia(video.play, `${video.id}.mp4`, video.cookie)
+}
+if (video.music) await saveMedia(video.music, `${video.id}.mp3`, video.cookie)
+
+console.log(await getProfile(&quot;tiktok&quot;))
+console.log(await getHashtag(&quot;fyp&quot;))</code></pre></div>
+<div class="code"><div class="code-head"><span class="code-lang">Menjalankan</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="bash">node client.mjs</code></pre></div>
+<h2 id="catatan">Catatan<a class="anchor" href="#catatan" aria-label="Tautan ke bagian ini">#</a></h2>
+<ul><li><code>api()</code> mengulang otomatis maksimal 2 kali saat status 429 sesuai <code>retry-after</code></li><li><code>saveMedia()</code> memakai stream sehingga file besar tidak dimuat penuh ke memori</li><li>Timeout 35 detik pada lookup melebihi batas server 28 detik</li></ul>
+      <div class="pager">
+        <a class="pager-a" href="/docs/guides/javascript/"><small>Sebelumnya</small><b>JavaScript</b></a>
+        <a class="pager-a pager-next" href="/docs/guides/python/"><small>Berikutnya</small><b>Python</b></a>
+      </div>
+    </article>
+  </main>
+  <aside class="dx-toc" aria-label="Daftar isi">
+    <div class="dx-toc-in"><b>DI HALAMAN INI</b><ul><li><a href="#kode">Klien Lengkap</a></li><li><a href="#catatan">Catatan</a></li></ul></div>
+  </aside>
+</div>
+<footer>
+  <span>© 2026 Tikobox</span>
+  <span>Dokumentasi API</span>
+</footer>
+<script src="/assets/js/docs.js" defer></script>
+</body>
+</html>

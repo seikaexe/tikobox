@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5ef">
+  <title>Audio Downloader - Tikobox Docs</title>
+  <meta name="description" content="Ambil musik atau suara dari video TikTok">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://tikobox.vercel.app/docs/downloader/audio/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tikobox">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:title" content="Audio Downloader - Tikobox Docs">
+  <meta property="og:description" content="Ambil musik atau suara dari video TikTok">
+  <meta property="og:url" content="https://tikobox.vercel.app/docs/downloader/audio/">
+  <meta property="og:image" content="https://tikobox.vercel.app/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="1200">
+  <meta property="og:image:alt" content="Logo Tikobox">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Audio Downloader - Tikobox Docs">
+  <meta name="twitter:description" content="Ambil musik atau suara dari video TikTok">
+  <meta name="twitter:image" content="https://tikobox.vercel.app/og-image.png">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/docs.css">
+  <meta name="monetag" content="cf97f76e709b8bde5c0e811e064a9711">
+</head>
+<body class="dx-body">
+<nav class="nav">
+  <a class="brand" href="/"><span>TIKO</span>BOX</a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a class="active" href="/docs/">Docs</a>
+  </div>
+</nav>
+<div class="dx-bar">
+  <button id="menuBtn" class="btn btn-sm" type="button" aria-expanded="false" aria-controls="side">MENU</button>
+  <button id="searchBtn" class="btn btn-sm btn-blue" type="button">CARI</button>
+  <span class="dx-crumb">Downloader</span>
+</div>
+<div class="dx">
+  <aside class="dx-side" id="side" aria-label="Navigasi dokumentasi">
+    <div class="dx-search">
+      <label class="sr" for="q">Cari dokumentasi</label>
+      <input id="q" type="search" placeholder="Cari dokumentasi" autocomplete="off" spellcheck="false">
+      <kbd aria-hidden="true">/</kbd>
+    </div>
+    <div id="results" class="dx-results" hidden></div>
+    <nav id="navlist"><div class="dx-group"><div class="dx-group-title">Mulai</div><a class="dx-link" href="/docs/">Beranda</a><a class="dx-link" href="/docs/getting-started/">Memulai</a><a class="dx-link" href="/docs/base-url/">Base URL</a><a class="dx-link" href="/docs/authentication/">Autentikasi</a><a class="dx-link" href="/docs/rate-limits/">Rate Limit</a><a class="dx-link" href="/docs/errors/">Penanganan Error</a><a class="dx-link" href="/docs/changelog/">Changelog</a></div><div class="dx-group"><div class="dx-group-title">Downloader</div><a class="dx-link" href="/docs/downloader/video/">Video Downloader</a><a class="dx-link on" href="/docs/downloader/audio/" aria-current="page">Audio Downloader</a><a class="dx-link" href="/docs/downloader/slideshow/">Slideshow Downloader</a><a class="dx-link" href="/docs/downloader/media-proxy/">Media Proxy</a></div><div class="dx-group"><div class="dx-group-title">TikTok</div><a class="dx-link" href="/docs/tiktok/profile/">Profil TikTok</a><a class="dx-link" href="/docs/tiktok/hashtag/">Hashtag TikTok</a></div><div class="dx-group"><div class="dx-group-title">Utility</div><a class="dx-link" href="/docs/utility/health/">Health Check</a><a class="dx-link" href="/docs/utility/info/">API Info</a></div><div class="dx-group"><div class="dx-group-title">Panduan</div><a class="dx-link" href="/docs/guides/curl/">cURL</a><a class="dx-link" href="/docs/guides/javascript/">JavaScript</a><a class="dx-link" href="/docs/guides/nodejs/">Node.js</a><a class="dx-link" href="/docs/guides/python/">Python</a><a class="dx-link" href="/docs/guides/php/">PHP</a><a class="dx-link" href="/docs/guides/web/">Aplikasi Web</a></div><div class="dx-group"><div class="dx-group-title">Referensi</div><a class="dx-link" href="/docs/reference/response-format/">Format Response</a><a class="dx-link" href="/docs/reference/status-codes/">Status Code</a><a class="dx-link" href="/docs/reference/security/">Keamanan dan Batasan</a><a class="dx-link" href="/docs/reference/not-available/">Belum Tersedia</a><a class="dx-link" href="/docs/reference/faq/">FAQ</a></div></nav>
+  </aside>
+  <div class="dx-overlay" id="overlay" hidden></div>
+  <main class="dx-main">
+    <article class="doc-content">
+      <div class="badge">DOWNLOADER</div>
+      <h1>Audio Downloader</h1>
+      <p class="lead">Ambil musik atau suara dari video TikTok</p>
+      <details class="toc-inline"><summary>Di halaman ini</summary><ul><li><a href="#field">Field Audio</a></li><li><a href="#alur">Alur</a></li><li><a href="#request">Contoh Unduh Audio</a></li><li><a href="#error">Response Error</a></li></ul></details>
+      <p>Audio tidak punya endpoint sendiri. URL audio ada di response <a href="/docs/downloader/video/"><code>/api/tiktok</code></a> pada field <code>music</code> dan <code>music_info.play</code>, lalu diunduh lewat <a href="/docs/downloader/media-proxy/"><code>/api/download</code></a></p>
+<h2 id="field">Field Audio<a class="anchor" href="#field" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="tbl "><table><thead><tr><th>Field</th><th>Tipe</th><th>Keterangan</th></tr></thead><tbody><tr><td><code>music</code></td><td>string</td><td>URL audio, kosong bila tidak tersedia</td></tr><tr><td><code>music_info.id</code></td><td>string</td><td>ID musik</td></tr><tr><td><code>music_info.title</code></td><td>string</td><td>Judul musik</td></tr><tr><td><code>music_info.play</code></td><td>string</td><td>URL audio, sama dengan <code>music</code></td></tr><tr><td><code>music_info.cover</code></td><td>string</td><td>URL cover musik</td></tr><tr><td><code>music_info.author</code></td><td>string</td><td>Nama pembuat musik</td></tr><tr><td><code>music_info.original</code></td><td>boolean</td><td>Suara asli dari pembuat video</td></tr><tr><td><code>music_info.duration</code></td><td>number</td><td>Durasi musik</td></tr><tr><td><code>music_info.album</code></td><td>string</td><td>Nama album, kosong bila tidak ada</td></tr></tbody></table></div>
+<h2 id="alur">Alur<a class="anchor" href="#alur" aria-label="Tautan ke bagian ini">#</a></h2>
+<ol><li>Panggil <code>/api/tiktok</code> lalu ambil <code>data.music</code></li><li>Pastikan nilainya tidak kosong</li><li>Unduh lewat <code>/api/download</code> dengan <code>name</code> berakhiran <code>.mp3</code></li></ol>
+<div class="note note-info">Bila <code>name</code> berakhiran <code>.mp3</code>, server memaksa <code>content-type: audio/mpeg</code> agar file tidak tersimpan sebagai <code>.mp3.mp4</code></div>
+<h2 id="request">Contoh Unduh Audio<a class="anchor" href="#request" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="tabs"><div class="tab-list" role="tablist"><button class="tab on" type="button" role="tab" data-tab="curl" aria-selected="true">cURL</button><button class="tab" type="button" role="tab" data-tab="fetch" aria-selected="false">Fetch</button><button class="tab" type="button" role="tab" data-tab="node" aria-selected="false">Node.js</button><button class="tab" type="button" role="tab" data-tab="python" aria-selected="false">Python</button><button class="tab" type="button" role="tab" data-tab="php" aria-selected="false">PHP</button></div><div class="tab-panel on" role="tabpanel" data-panel="curl"><div class="code"><div class="code-head"><span class="code-lang">cURL</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="bash">curl -sS -f -G &quot;https://tikobox.my.id/api/download&quot; \
+  -A &quot;MyTikoboxClient/1.0&quot; \
+  --data-urlencode &quot;url=https://sf16.tiktokcdn.com/xxxx/music.mp3&quot; \
+  --data-urlencode &quot;name=audio.mp3&quot; \
+  -o &quot;audio.mp3&quot;</code></pre></div></div><div class="tab-panel" role="tabpanel" data-panel="fetch"><div class="code"><div class="code-head"><span class="code-lang">Fetch</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="js">const url = new URL(&quot;https://tikobox.my.id/api/download&quot;)
+url.searchParams.set(&quot;url&quot;, &quot;https://sf16.tiktokcdn.com/xxxx/music.mp3&quot;)
+url.searchParams.set(&quot;name&quot;, &quot;audio.mp3&quot;)
+
+const res = await fetch(url)
+if (!res.ok) throw new Error((await res.json()).msg)
+
+const blob = await res.blob()
+console.log(blob.type, blob.size)</code></pre></div></div><div class="tab-panel" role="tabpanel" data-panel="node"><div class="code"><div class="code-head"><span class="code-lang">Node.js</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="js">import { createWriteStream } from &quot;node:fs&quot;
+import { Readable } from &quot;node:stream&quot;
+import { pipeline } from &quot;node:stream/promises&quot;
+
+const url = new URL(&quot;https://tikobox.my.id/api/download&quot;)
+url.searchParams.set(&quot;url&quot;, &quot;https://sf16.tiktokcdn.com/xxxx/music.mp3&quot;)
+url.searchParams.set(&quot;name&quot;, &quot;audio.mp3&quot;)
+
+const res = await fetch(url, { headers: { &quot;User-Agent&quot;: &quot;MyTikoboxClient/1.0&quot; } })
+if (!res.ok) throw new Error((await res.json()).msg)
+
+await pipeline(Readable.fromWeb(res.body), createWriteStream(&quot;audio.mp3&quot;))
+console.log(&quot;tersimpan:&quot;, &quot;audio.mp3&quot;)</code></pre></div></div><div class="tab-panel" role="tabpanel" data-panel="python"><div class="code"><div class="code-head"><span class="code-lang">Python</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="python">import requests
+
+res = requests.get(
+    &quot;https://tikobox.my.id/api/download&quot;,
+    params={
+        &quot;url&quot;: &quot;https://sf16.tiktokcdn.com/xxxx/music.mp3&quot;,
+        &quot;name&quot;: &quot;audio.mp3&quot;,
+    },
+    headers={&quot;User-Agent&quot;: &quot;MyTikoboxClient/1.0&quot;},
+    stream=True,
+    timeout=35,
+)
+
+if not res.ok:
+    raise RuntimeError(res.json()[&quot;msg&quot;])
+
+with open(&quot;audio.mp3&quot;, &quot;wb&quot;) as f:
+    for chunk in res.iter_content(chunk_size=65536):
+        f.write(chunk)</code></pre></div></div><div class="tab-panel" role="tabpanel" data-panel="php"><div class="code"><div class="code-head"><span class="code-lang">PHP</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="php">&lt;?php
+
+$query = http_build_query([
+    &quot;url&quot; =&gt; &quot;https://sf16.tiktokcdn.com/xxxx/music.mp3&quot;,
+    &quot;name&quot; =&gt; &quot;audio.mp3&quot;,
+]);
+
+$ch = curl_init(&quot;https://tikobox.my.id/api/download&quot; . &quot;?&quot; . $query);
+$file = fopen(&quot;audio.mp3&quot;, &quot;wb&quot;);
+
+curl_setopt_array($ch, [
+    CURLOPT_FILE =&gt; $file,
+    CURLOPT_FOLLOWLOCATION =&gt; false,
+    CURLOPT_TIMEOUT =&gt; 0,
+    CURLOPT_USERAGENT =&gt; &quot;MyTikoboxClient/1.0&quot;,
+]);
+
+if (!curl_exec($ch)) {
+    throw new RuntimeException(curl_error($ch));
+}
+
+$status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+fclose($file);
+
+if ($status !== 200) {
+    unlink(&quot;audio.mp3&quot;);
+    throw new RuntimeException(&quot;HTTP $status&quot;);
+}</code></pre></div></div></div>
+<div class="note note-info">Nilai pada contoh response bersifat ilustrasi, bukan data nyata</div>
+<h2 id="error">Response Error<a class="anchor" href="#error" aria-label="Tautan ke bagian ini">#</a></h2>
+<p>Sama dengan <a href="/docs/downloader/media-proxy/#error">Media Proxy</a></p>
+      <div class="pager">
+        <a class="pager-a" href="/docs/downloader/video/"><small>Sebelumnya</small><b>Video Downloader</b></a>
+        <a class="pager-a pager-next" href="/docs/downloader/slideshow/"><small>Berikutnya</small><b>Slideshow Downloader</b></a>
+      </div>
+    </article>
+  </main>
+  <aside class="dx-toc" aria-label="Daftar isi">
+    <div class="dx-toc-in"><b>DI HALAMAN INI</b><ul><li><a href="#field">Field Audio</a></li><li><a href="#alur">Alur</a></li><li><a href="#request">Contoh Unduh Audio</a></li><li><a href="#error">Response Error</a></li></ul></div>
+  </aside>
+</div>
+<footer>
+  <span>© 2026 Tikobox</span>
+  <span>Dokumentasi API</span>
+</footer>
+<script src="/assets/js/docs.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5ef">
+  <title>Dokumentasi API - Tikobox</title>
+  <meta name="description" content="REST API untuk mengambil video, audio, foto, profil, dan hashtag TikTok">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://tikobox.vercel.app/docs/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tikobox">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:title" content="Dokumentasi API - Tikobox">
+  <meta property="og:description" content="REST API untuk mengambil video, audio, foto, profil, dan hashtag TikTok">
+  <meta property="og:url" content="https://tikobox.vercel.app/docs/">
+  <meta property="og:image" content="https://tikobox.vercel.app/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="1200">
+  <meta property="og:image:alt" content="Logo Tikobox">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Dokumentasi API - Tikobox">
+  <meta name="twitter:description" content="REST API untuk mengambil video, audio, foto, profil, dan hashtag TikTok">
+  <meta name="twitter:image" content="https://tikobox.vercel.app/og-image.png">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/docs.css">
+  <meta name="monetag" content="cf97f76e709b8bde5c0e811e064a9711">
+</head>
+<body class="dx-body">
+<nav class="nav">
+  <a class="brand" href="/"><span>TIKO</span>BOX</a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a class="active" href="/docs/">Docs</a>
+  </div>
+</nav>
+<div class="dx-bar">
+  <button id="menuBtn" class="btn btn-sm" type="button" aria-expanded="false" aria-controls="side">MENU</button>
+  <button id="searchBtn" class="btn btn-sm btn-blue" type="button">CARI</button>
+  <span class="dx-crumb">Mulai</span>
+</div>
+<div class="dx">
+  <aside class="dx-side" id="side" aria-label="Navigasi dokumentasi">
+    <div class="dx-search">
+      <label class="sr" for="q">Cari dokumentasi</label>
+      <input id="q" type="search" placeholder="Cari dokumentasi" autocomplete="off" spellcheck="false">
+      <kbd aria-hidden="true">/</kbd>
+    </div>
+    <div id="results" class="dx-results" hidden></div>
+    <nav id="navlist"><div class="dx-group"><div class="dx-group-title">Mulai</div><a class="dx-link on" href="/docs/" aria-current="page">Beranda</a><a class="dx-link" href="/docs/getting-started/">Memulai</a><a class="dx-link" href="/docs/base-url/">Base URL</a><a class="dx-link" href="/docs/authentication/">Autentikasi</a><a class="dx-link" href="/docs/rate-limits/">Rate Limit</a><a class="dx-link" href="/docs/errors/">Penanganan Error</a><a class="dx-link" href="/docs/changelog/">Changelog</a></div><div class="dx-group"><div class="dx-group-title">Downloader</div><a class="dx-link" href="/docs/downloader/video/">Video Downloader</a><a class="dx-link" href="/docs/downloader/audio/">Audio Downloader</a><a class="dx-link" href="/docs/downloader/slideshow/">Slideshow Downloader</a><a class="dx-link" href="/docs/downloader/media-proxy/">Media Proxy</a></div><div class="dx-group"><div class="dx-group-title">TikTok</div><a class="dx-link" href="/docs/tiktok/profile/">Profil TikTok</a><a class="dx-link" href="/docs/tiktok/hashtag/">Hashtag TikTok</a></div><div class="dx-group"><div class="dx-group-title">Utility</div><a class="dx-link" href="/docs/utility/health/">Health Check</a><a class="dx-link" href="/docs/utility/info/">API Info</a></div><div class="dx-group"><div class="dx-group-title">Panduan</div><a class="dx-link" href="/docs/guides/curl/">cURL</a><a class="dx-link" href="/docs/guides/javascript/">JavaScript</a><a class="dx-link" href="/docs/guides/nodejs/">Node.js</a><a class="dx-link" href="/docs/guides/python/">Python</a><a class="dx-link" href="/docs/guides/php/">PHP</a><a class="dx-link" href="/docs/guides/web/">Aplikasi Web</a></div><div class="dx-group"><div class="dx-group-title">Referensi</div><a class="dx-link" href="/docs/reference/response-format/">Format Response</a><a class="dx-link" href="/docs/reference/status-codes/">Status Code</a><a class="dx-link" href="/docs/reference/security/">Keamanan dan Batasan</a><a class="dx-link" href="/docs/reference/not-available/">Belum Tersedia</a><a class="dx-link" href="/docs/reference/faq/">FAQ</a></div></nav>
+  </aside>
+  <div class="dx-overlay" id="overlay" hidden></div>
+  <main class="dx-main">
+    <article class="doc-content">
+      <div class="badge">MULAI</div>
+      <h1>Dokumentasi Tikobox API</h1>
+      <p class="lead">REST API untuk mengambil video, audio, foto, profil, dan hashtag TikTok</p>
+      <details class="toc-inline"><summary>Di halaman ini</summary><ul><li><a href="#mulai-cepat">Mulai Cepat</a></li><li><a href="#endpoint">Daftar Endpoint</a></li><li><a href="#kategori">Kategori</a></li></ul></details>
+      <p>Tikobox adalah TikTok Downloader sekaligus REST API untuk developer. Semua endpoint berada di bawah <code>/api/</code>, memakai method <code>GET</code>, dan mengembalikan JSON</p>
+<div class="note note-ok">Tanpa API key dan tanpa login. Cukup kirim request ke Base URL</div>
+<h2 id="mulai-cepat">Mulai Cepat<a class="anchor" href="#mulai-cepat" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="code"><div class="code-head"><span class="code-lang">cURL</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="bash">curl -sS -G &quot;https://tikobox.my.id/api/tiktok&quot; \
+  -A &quot;MyTikoboxClient/1.0&quot; \
+  --data-urlencode &quot;url=https://vt.tiktok.com/ZSxxxxxxx/&quot;</code></pre></div>
+<p>Lanjut ke <a href="/docs/getting-started/">Memulai</a> untuk alur lengkap dari mengambil info video sampai menyimpan file</p>
+<h2 id="endpoint">Daftar Endpoint<a class="anchor" href="#endpoint" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="tbl "><table><thead><tr><th>Method</th><th>Endpoint</th><th>Fungsi</th></tr></thead><tbody><tr><td><span class="m m-get">GET</span></td><td><code>/api/tiktok</code></td><td>Info video, audio, atau foto dari link TikTok. <a href="/docs/downloader/video/">Detail</a></td></tr><tr><td><span class="m m-get">GET</span></td><td><code>/api/{link}</code></td><td>Bentuk singkat: tempel link setelah <code>/api/</code>. <a href="/docs/downloader/video/#bentuk-singkat">Detail</a></td></tr><tr><td><span class="m m-get">GET</span></td><td><code>/api/download</code></td><td>Proxy unduh file media. <a href="/docs/downloader/media-proxy/">Detail</a></td></tr><tr><td><span class="m m-get">GET</span></td><td><code>/api/user</code></td><td>Profil akun. Juga <code>/api/user/{username}</code> dan <code>/api/@{username}</code>. <a href="/docs/tiktok/profile/">Detail</a></td></tr><tr><td><span class="m m-get">GET</span></td><td><code>/api/hashtag</code></td><td>Statistik hashtag. Juga <code>/api/hashtag/{name}</code>. <a href="/docs/tiktok/hashtag/">Detail</a></td></tr><tr><td><span class="m m-get">GET</span></td><td><code>/api/health</code></td><td>Cek server hidup. <a href="/docs/utility/health/">Detail</a></td></tr><tr><td><span class="m m-get">GET</span></td><td><code>/api/</code></td><td>Info penggunaan API. <a href="/docs/utility/info/">Detail</a></td></tr></tbody></table></div>
+<h2 id="kategori">Kategori<a class="anchor" href="#kategori" aria-label="Tautan ke bagian ini">#</a></h2>
+<ul><li><a href="/docs/downloader/video/">Video</a>, <a href="/docs/downloader/audio/">Audio</a>, dan <a href="/docs/downloader/slideshow/">Slideshow</a> diambil dari satu endpoint <code>/api/tiktok</code></li><li><a href="/docs/tiktok/profile/">Profil</a> dan <a href="/docs/tiktok/hashtag/">Hashtag</a> untuk data akun dan tagar</li><li>Fitur yang belum ada, seperti pencarian user dan pemrosesan media, dijelaskan di <a href="/docs/reference/not-available/">Belum Tersedia</a></li></ul>
+      <div class="pager">
+        <span></span>
+        <a class="pager-a pager-next" href="/docs/getting-started/"><small>Berikutnya</small><b>Memulai</b></a>
+      </div>
+    </article>
+  </main>
+  <aside class="dx-toc" aria-label="Daftar isi">
+    <div class="dx-toc-in"><b>DI HALAMAN INI</b><ul><li><a href="#mulai-cepat">Mulai Cepat</a></li><li><a href="#endpoint">Daftar Endpoint</a></li><li><a href="#kategori">Kategori</a></li></ul></div>
+  </aside>
+</div>
+<footer>
+  <span>© 2026 Tikobox</span>
+  <span>Dokumentasi API</span>
+</footer>
+<script src="/assets/js/docs.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5ef">
+  <title>Keamanan dan Batasan - Tikobox Docs</title>
+  <meta name="description" content="Perlindungan di server dan batasan teknis untuk integrator">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://tikobox.vercel.app/docs/reference/security/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tikobox">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:title" content="Keamanan dan Batasan - Tikobox Docs">
+  <meta property="og:description" content="Perlindungan di server dan batasan teknis untuk integrator">
+  <meta property="og:url" content="https://tikobox.vercel.app/docs/reference/security/">
+  <meta property="og:image" content="https://tikobox.vercel.app/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="1200">
+  <meta property="og:image:alt" content="Logo Tikobox">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Keamanan dan Batasan - Tikobox Docs">
+  <meta name="twitter:description" content="Perlindungan di server dan batasan teknis untuk integrator">
+  <meta name="twitter:image" content="https://tikobox.vercel.app/og-image.png">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/docs.css">
+  <meta name="monetag" content="cf97f76e709b8bde5c0e811e064a9711">
+</head>
+<body class="dx-body">
+<nav class="nav">
+  <a class="brand" href="/"><span>TIKO</span>BOX</a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a class="active" href="/docs/">Docs</a>
+  </div>
+</nav>
+<div class="dx-bar">
+  <button id="menuBtn" class="btn btn-sm" type="button" aria-expanded="false" aria-controls="side">MENU</button>
+  <button id="searchBtn" class="btn btn-sm btn-blue" type="button">CARI</button>
+  <span class="dx-crumb">Referensi</span>
+</div>
+<div class="dx">
+  <aside class="dx-side" id="side" aria-label="Navigasi dokumentasi">
+    <div class="dx-search">
+      <label class="sr" for="q">Cari dokumentasi</label>
+      <input id="q" type="search" placeholder="Cari dokumentasi" autocomplete="off" spellcheck="false">
+      <kbd aria-hidden="true">/</kbd>
+    </div>
+    <div id="results" class="dx-results" hidden></div>
+    <nav id="navlist"><div class="dx-group"><div class="dx-group-title">Mulai</div><a class="dx-link" href="/docs/">Beranda</a><a class="dx-link" href="/docs/getting-started/">Memulai</a><a class="dx-link" href="/docs/base-url/">Base URL</a><a class="dx-link" href="/docs/authentication/">Autentikasi</a><a class="dx-link" href="/docs/rate-limits/">Rate Limit</a><a class="dx-link" href="/docs/errors/">Penanganan Error</a><a class="dx-link" href="/docs/changelog/">Changelog</a></div><div class="dx-group"><div class="dx-group-title">Downloader</div><a class="dx-link" href="/docs/downloader/video/">Video Downloader</a><a class="dx-link" href="/docs/downloader/audio/">Audio Downloader</a><a class="dx-link" href="/docs/downloader/slideshow/">Slideshow Downloader</a><a class="dx-link" href="/docs/downloader/media-proxy/">Media Proxy</a></div><div class="dx-group"><div class="dx-group-title">TikTok</div><a class="dx-link" href="/docs/tiktok/profile/">Profil TikTok</a><a class="dx-link" href="/docs/tiktok/hashtag/">Hashtag TikTok</a></div><div class="dx-group"><div class="dx-group-title">Utility</div><a class="dx-link" href="/docs/utility/health/">Health Check</a><a class="dx-link" href="/docs/utility/info/">API Info</a></div><div class="dx-group"><div class="dx-group-title">Panduan</div><a class="dx-link" href="/docs/guides/curl/">cURL</a><a class="dx-link" href="/docs/guides/javascript/">JavaScript</a><a class="dx-link" href="/docs/guides/nodejs/">Node.js</a><a class="dx-link" href="/docs/guides/python/">Python</a><a class="dx-link" href="/docs/guides/php/">PHP</a><a class="dx-link" href="/docs/guides/web/">Aplikasi Web</a></div><div class="dx-group"><div class="dx-group-title">Referensi</div><a class="dx-link" href="/docs/reference/response-format/">Format Response</a><a class="dx-link" href="/docs/reference/status-codes/">Status Code</a><a class="dx-link on" href="/docs/reference/security/" aria-current="page">Keamanan dan Batasan</a><a class="dx-link" href="/docs/reference/not-available/">Belum Tersedia</a><a class="dx-link" href="/docs/reference/faq/">FAQ</a></div></nav>
+  </aside>
+  <div class="dx-overlay" id="overlay" hidden></div>
+  <main class="dx-main">
+    <article class="doc-content">
+      <div class="badge">REFERENSI</div>
+      <h1>Keamanan dan Batasan</h1>
+      <p class="lead">Perlindungan di server dan batasan teknis untuk integrator</p>
+      <details class="toc-inline"><summary>Di halaman ini</summary><ul><li><a href="#perlindungan">Perlindungan di Server</a></li><li><a href="#batasan">Batasan Teknis</a></li><li><a href="#saran">Saran untuk Integrator</a></li></ul></details>
+      <h2 id="perlindungan">Perlindungan di Server<a class="anchor" href="#perlindungan" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="tbl "><table><thead><tr><th>Area</th><th>Penerapan</th></tr></thead><tbody><tr><td>Validasi input</td><td>Link TikTok dan URL media divalidasi dengan allowlist host, hanya <code>http</code> atau <code>https</code>, tanpa kredensial dan tanpa port</td></tr><tr><td>SSRF</td><td>Redirect diikuti manual, setiap hop divalidasi, dan DNS harus mengarah ke IP publik</td></tr><tr><td>Tipe file</td><td>Hanya video, audio, dan gambar rasteri yang diproxy. SVG dan HTML ditolak</td></tr><tr><td>Nama file</td><td>Disaring menjadi karakter aman sehingga tidak bisa memuat path atau karakter kontrol</td></tr><tr><td>Header keamanan</td><td>Helmet dan Content-Security-Policy. File hasil proxy dikirim dengan CSP sandbox dan <code>nosniff</code></td></tr><tr><td>Log</td><td>Kejadian keamanan dicatat tanpa cookie, query, dan header, dengan IP disamarkan</td></tr><tr><td>Error</td><td>Pesan error disaring agar tidak membocorkan jalur file atau detail jaringan</td></tr></tbody></table></div>
+<h2 id="batasan">Batasan Teknis<a class="anchor" href="#batasan" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="tbl "><table><thead><tr><th>Hal</th><th>Nilai</th></tr></thead><tbody><tr><td>Panjang URL request</td><td>2500 karakter</td></tr><tr><td>Panjang link TikTok</td><td>500 karakter (teks input dipotong di 1000 karakter)</td></tr><tr><td>Panjang URL media</td><td>2000 karakter</td></tr><tr><td>Timeout lookup</td><td>28 detik</td></tr><tr><td>Timeout header dari TikTok saat unduh</td><td>15 detik</td></tr><tr><td>Maksimal redirect saat unduh</td><td>3</td></tr><tr><td>Ukuran file unduhan</td><td>Tidak dibatasi</td></tr><tr><td>Method</td><td>GET, HEAD, OPTIONS</td></tr><tr><td>CORS</td><td>Tidak ada header CORS</td></tr></tbody></table></div>
+<h2 id="saran">Saran untuk Integrator<a class="anchor" href="#saran" aria-label="Tautan ke bagian ini">#</a></h2>
+<ul><li>Panggil API dari backend, bukan dari browser pengguna</li><li>Jangan menyimpan URL media untuk jangka panjang, masa berlakunya ditentukan TikTok</li><li>Perlakukan <code>data.cookie</code> sebagai data sementara dan jangan dibagikan ke pihak lain</li><li>Batasi jumlah percobaan ulang dan hormati <code>retry-after</code></li><li>Gunakan konten hanya sesuai hak dan kebijakan platform serta hukum yang berlaku</li></ul>
+      <div class="pager">
+        <a class="pager-a" href="/docs/reference/status-codes/"><small>Sebelumnya</small><b>Status Code</b></a>
+        <a class="pager-a pager-next" href="/docs/reference/not-available/"><small>Berikutnya</small><b>Belum Tersedia</b></a>
+      </div>
+    </article>
+  </main>
+  <aside class="dx-toc" aria-label="Daftar isi">
+    <div class="dx-toc-in"><b>DI HALAMAN INI</b><ul><li><a href="#perlindungan">Perlindungan di Server</a></li><li><a href="#batasan">Batasan Teknis</a></li><li><a href="#saran">Saran untuk Integrator</a></li></ul></div>
+  </aside>
+</div>
+<footer>
+  <span>© 2026 Tikobox</span>
+  <span>Dokumentasi API</span>
+</footer>
+<script src="/assets/js/docs.js" defer></script>
+</body>
+</html>

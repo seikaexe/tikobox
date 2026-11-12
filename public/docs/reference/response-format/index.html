@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5ef">
+  <title>Format Response - Tikobox Docs</title>
+  <meta name="description" content="Struktur JSON semua response">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://tikobox.vercel.app/docs/reference/response-format/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tikobox">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:title" content="Format Response - Tikobox Docs">
+  <meta property="og:description" content="Struktur JSON semua response">
+  <meta property="og:url" content="https://tikobox.vercel.app/docs/reference/response-format/">
+  <meta property="og:image" content="https://tikobox.vercel.app/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="1200">
+  <meta property="og:image:alt" content="Logo Tikobox">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Format Response - Tikobox Docs">
+  <meta name="twitter:description" content="Struktur JSON semua response">
+  <meta name="twitter:image" content="https://tikobox.vercel.app/og-image.png">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/docs.css">
+  <meta name="monetag" content="cf97f76e709b8bde5c0e811e064a9711">
+</head>
+<body class="dx-body">
+<nav class="nav">
+  <a class="brand" href="/"><span>TIKO</span>BOX</a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a class="active" href="/docs/">Docs</a>
+  </div>
+</nav>
+<div class="dx-bar">
+  <button id="menuBtn" class="btn btn-sm" type="button" aria-expanded="false" aria-controls="side">MENU</button>
+  <button id="searchBtn" class="btn btn-sm btn-blue" type="button">CARI</button>
+  <span class="dx-crumb">Referensi</span>
+</div>
+<div class="dx">
+  <aside class="dx-side" id="side" aria-label="Navigasi dokumentasi">
+    <div class="dx-search">
+      <label class="sr" for="q">Cari dokumentasi</label>
+      <input id="q" type="search" placeholder="Cari dokumentasi" autocomplete="off" spellcheck="false">
+      <kbd aria-hidden="true">/</kbd>
+    </div>
+    <div id="results" class="dx-results" hidden></div>
+    <nav id="navlist"><div class="dx-group"><div class="dx-group-title">Mulai</div><a class="dx-link" href="/docs/">Beranda</a><a class="dx-link" href="/docs/getting-started/">Memulai</a><a class="dx-link" href="/docs/base-url/">Base URL</a><a class="dx-link" href="/docs/authentication/">Autentikasi</a><a class="dx-link" href="/docs/rate-limits/">Rate Limit</a><a class="dx-link" href="/docs/errors/">Penanganan Error</a><a class="dx-link" href="/docs/changelog/">Changelog</a></div><div class="dx-group"><div class="dx-group-title">Downloader</div><a class="dx-link" href="/docs/downloader/video/">Video Downloader</a><a class="dx-link" href="/docs/downloader/audio/">Audio Downloader</a><a class="dx-link" href="/docs/downloader/slideshow/">Slideshow Downloader</a><a class="dx-link" href="/docs/downloader/media-proxy/">Media Proxy</a></div><div class="dx-group"><div class="dx-group-title">TikTok</div><a class="dx-link" href="/docs/tiktok/profile/">Profil TikTok</a><a class="dx-link" href="/docs/tiktok/hashtag/">Hashtag TikTok</a></div><div class="dx-group"><div class="dx-group-title">Utility</div><a class="dx-link" href="/docs/utility/health/">Health Check</a><a class="dx-link" href="/docs/utility/info/">API Info</a></div><div class="dx-group"><div class="dx-group-title">Panduan</div><a class="dx-link" href="/docs/guides/curl/">cURL</a><a class="dx-link" href="/docs/guides/javascript/">JavaScript</a><a class="dx-link" href="/docs/guides/nodejs/">Node.js</a><a class="dx-link" href="/docs/guides/python/">Python</a><a class="dx-link" href="/docs/guides/php/">PHP</a><a class="dx-link" href="/docs/guides/web/">Aplikasi Web</a></div><div class="dx-group"><div class="dx-group-title">Referensi</div><a class="dx-link on" href="/docs/reference/response-format/" aria-current="page">Format Response</a><a class="dx-link" href="/docs/reference/status-codes/">Status Code</a><a class="dx-link" href="/docs/reference/security/">Keamanan dan Batasan</a><a class="dx-link" href="/docs/reference/not-available/">Belum Tersedia</a><a class="dx-link" href="/docs/reference/faq/">FAQ</a></div></nav>
+  </aside>
+  <div class="dx-overlay" id="overlay" hidden></div>
+  <main class="dx-main">
+    <article class="doc-content">
+      <div class="badge">REFERENSI</div>
+      <h1>Format Response</h1>
+      <p class="lead">Struktur JSON semua response</p>
+      <details class="toc-inline"><summary>Di halaman ini</summary><ul><li><a href="#envelope">Envelope</a></li><li><a href="#video">Data Video</a></li><li><a href="#profil">Data Profil</a></li><li><a href="#hashtag">Data Hashtag</a></li><li><a href="#konvensi">Konvensi</a></li></ul></details>
+      <h2 id="envelope">Envelope<a class="anchor" href="#envelope" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="code"><div class="code-head"><span class="code-lang">Sukses</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="json">{
+  &quot;code&quot;: 0,
+  &quot;msg&quot;: &quot;success&quot;,
+  &quot;processed_time&quot;: 1.2345,
+  &quot;data&quot;: {}
+}</code></pre></div>
+<div class="code"><div class="code-head"><span class="code-lang">Gagal</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="json">{
+  &quot;code&quot;: -1,
+  &quot;msg&quot;: &quot;pesan error&quot;
+}</code></pre></div>
+<div class="tbl "><table><thead><tr><th>Field</th><th>Tipe</th><th>Keterangan</th></tr></thead><tbody><tr><td><code>code</code></td><td>number</td><td><code>0</code> sukses, <code>-1</code> gagal</td></tr><tr><td><code>msg</code></td><td>string</td><td><code>success</code> atau pesan error</td></tr><tr><td><code>processed_time</code></td><td>number</td><td>Lama proses dalam detik. Ada pada response lookup, tidak ada pada health dan info</td></tr><tr><td><code>data</code></td><td>object</td><td>Isi hasil, hanya ada saat sukses</td></tr></tbody></table></div>
+<h2 id="video">Data Video<a class="anchor" href="#video" aria-label="Tautan ke bagian ini">#</a></h2>
+<p>Untuk <a href="/docs/downloader/video/"><code>/api/tiktok</code></a></p>
+<div class="tbl "><table><thead><tr><th>Field</th><th>Tipe</th><th>Keterangan</th></tr></thead><tbody><tr><td><code>id</code></td><td>string</td><td>ID video</td></tr><tr><td><code>region</code></td><td>string</td><td>Kode wilayah pembuatan, kosong bila tidak ada</td></tr><tr><td><code>title</code></td><td>string</td><td>Caption video</td></tr><tr><td><code>cover</code></td><td>string</td><td>URL gambar cover</td></tr><tr><td><code>origin_cover</code></td><td>string</td><td>URL cover asli</td></tr><tr><td><code>duration</code></td><td>number</td><td>Durasi, 0 bila tidak tersedia</td></tr><tr><td><code>play</code></td><td>string</td><td>URL MP4 tanpa watermark (kualitas standar)</td></tr><tr><td><code>wmplay</code></td><td>string</td><td>URL MP4 dengan watermark. Sama dengan <code>play</code> bila versi watermark tidak ada</td></tr><tr><td><code>hdplay</code></td><td>string</td><td>URL MP4 HD. Sama dengan <code>play</code> bila HD tidak ada</td></tr><tr><td><code>size</code></td><td>number</td><td>Ukuran <code>play</code> dalam byte, 0 bila tidak diketahui</td></tr><tr><td><code>wm_size</code></td><td>number</td><td>Ukuran <code>wmplay</code> dalam byte</td></tr><tr><td><code>hd_size</code></td><td>number</td><td>Ukuran <code>hdplay</code> dalam byte</td></tr><tr><td><code>create_time</code></td><td>number</td><td>Waktu posting, Unix timestamp</td></tr><tr><td><code>author</code></td><td>object</td><td><code>id</code>, <code>unique_id</code>, <code>nickname</code>, <code>avatar</code></td></tr><tr><td><code>cookie</code></td><td>string</td><td>Hanya ada bila TikTok memberi cookie sesi. Teruskan ke <code>/api/download</code> lewat parameter <code>c</code></td></tr></tbody></table></div>
+<div class="tbl "><table><thead><tr><th>Field</th><th>Tipe</th><th>Keterangan</th></tr></thead><tbody><tr><td><code>music</code></td><td>string</td><td>URL audio. Lihat <a href="/docs/downloader/audio/">Audio</a></td></tr><tr><td><code>music_info</code></td><td>object</td><td><code>id</code>, <code>title</code>, <code>play</code>, <code>cover</code>, <code>author</code>, <code>original</code>, <code>duration</code>, <code>album</code></td></tr><tr><td><code>play_count</code></td><td>number</td><td>Jumlah ditonton</td></tr><tr><td><code>digg_count</code></td><td>number</td><td>Jumlah like</td></tr><tr><td><code>comment_count</code></td><td>number</td><td>Jumlah komentar</td></tr><tr><td><code>share_count</code></td><td>number</td><td>Jumlah dibagikan</td></tr><tr><td><code>collect_count</code></td><td>number</td><td>Jumlah disimpan</td></tr><tr><td><code>download_count</code></td><td>number</td><td>Selalu <code>0</code></td></tr><tr><td><code>images</code></td><td>string[]</td><td>Hanya ada pada postingan foto. Lihat <a href="/docs/downloader/slideshow/">Slideshow</a></td></tr></tbody></table></div>
+<h2 id="profil">Data Profil<a class="anchor" href="#profil" aria-label="Tautan ke bagian ini">#</a></h2>
+<p>Lihat <a href="/docs/tiktok/profile/#field">Profil TikTok</a></p>
+<h2 id="hashtag">Data Hashtag<a class="anchor" href="#hashtag" aria-label="Tautan ke bagian ini">#</a></h2>
+<p>Lihat <a href="/docs/tiktok/hashtag/#field">Hashtag TikTok</a></p>
+<h2 id="konvensi">Konvensi<a class="anchor" href="#konvensi" aria-label="Tautan ke bagian ini">#</a></h2>
+<ul><li>Field string yang tidak tersedia berisi string kosong, bukan <code>null</code></li><li>Field angka yang tidak tersedia berisi <code>0</code></li><li>Field opsional (<code>images</code>, <code>cookie</code>) tidak ada sama sekali saat tidak tersedia</li><li>Urutan field di JSON tidak dijamin, akses berdasarkan nama</li></ul>
+      <div class="pager">
+        <a class="pager-a" href="/docs/guides/web/"><small>Sebelumnya</small><b>Aplikasi Web</b></a>
+        <a class="pager-a pager-next" href="/docs/reference/status-codes/"><small>Berikutnya</small><b>Status Code</b></a>
+      </div>
+    </article>
+  </main>
+  <aside class="dx-toc" aria-label="Daftar isi">
+    <div class="dx-toc-in"><b>DI HALAMAN INI</b><ul><li><a href="#envelope">Envelope</a></li><li><a href="#video">Data Video</a></li><li><a href="#profil">Data Profil</a></li><li><a href="#hashtag">Data Hashtag</a></li><li><a href="#konvensi">Konvensi</a></li></ul></div>
+  </aside>
+</div>
+<footer>
+  <span>© 2026 Tikobox</span>
+  <span>Dokumentasi API</span>
+</footer>
+<script src="/assets/js/docs.js" defer></script>
+</body>
+</html>

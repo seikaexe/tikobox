@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5ef">
+  <title>Aplikasi Web - Tikobox Docs</title>
+  <meta name="description" content="Cara memakai Tikobox lewat website">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://tikobox.vercel.app/docs/guides/web/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tikobox">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:title" content="Aplikasi Web - Tikobox Docs">
+  <meta property="og:description" content="Cara memakai Tikobox lewat website">
+  <meta property="og:url" content="https://tikobox.vercel.app/docs/guides/web/">
+  <meta property="og:image" content="https://tikobox.vercel.app/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="1200">
+  <meta property="og:image:alt" content="Logo Tikobox">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Aplikasi Web - Tikobox Docs">
+  <meta name="twitter:description" content="Cara memakai Tikobox lewat website">
+  <meta name="twitter:image" content="https://tikobox.vercel.app/og-image.png">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/docs.css">
+  <meta name="monetag" content="cf97f76e709b8bde5c0e811e064a9711">
+</head>
+<body class="dx-body">
+<nav class="nav">
+  <a class="brand" href="/"><span>TIKO</span>BOX</a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a class="active" href="/docs/">Docs</a>
+  </div>
+</nav>
+<div class="dx-bar">
+  <button id="menuBtn" class="btn btn-sm" type="button" aria-expanded="false" aria-controls="side">MENU</button>
+  <button id="searchBtn" class="btn btn-sm btn-blue" type="button">CARI</button>
+  <span class="dx-crumb">Panduan</span>
+</div>
+<div class="dx">
+  <aside class="dx-side" id="side" aria-label="Navigasi dokumentasi">
+    <div class="dx-search">
+      <label class="sr" for="q">Cari dokumentasi</label>
+      <input id="q" type="search" placeholder="Cari dokumentasi" autocomplete="off" spellcheck="false">
+      <kbd aria-hidden="true">/</kbd>
+    </div>
+    <div id="results" class="dx-results" hidden></div>
+    <nav id="navlist"><div class="dx-group"><div class="dx-group-title">Mulai</div><a class="dx-link" href="/docs/">Beranda</a><a class="dx-link" href="/docs/getting-started/">Memulai</a><a class="dx-link" href="/docs/base-url/">Base URL</a><a class="dx-link" href="/docs/authentication/">Autentikasi</a><a class="dx-link" href="/docs/rate-limits/">Rate Limit</a><a class="dx-link" href="/docs/errors/">Penanganan Error</a><a class="dx-link" href="/docs/changelog/">Changelog</a></div><div class="dx-group"><div class="dx-group-title">Downloader</div><a class="dx-link" href="/docs/downloader/video/">Video Downloader</a><a class="dx-link" href="/docs/downloader/audio/">Audio Downloader</a><a class="dx-link" href="/docs/downloader/slideshow/">Slideshow Downloader</a><a class="dx-link" href="/docs/downloader/media-proxy/">Media Proxy</a></div><div class="dx-group"><div class="dx-group-title">TikTok</div><a class="dx-link" href="/docs/tiktok/profile/">Profil TikTok</a><a class="dx-link" href="/docs/tiktok/hashtag/">Hashtag TikTok</a></div><div class="dx-group"><div class="dx-group-title">Utility</div><a class="dx-link" href="/docs/utility/health/">Health Check</a><a class="dx-link" href="/docs/utility/info/">API Info</a></div><div class="dx-group"><div class="dx-group-title">Panduan</div><a class="dx-link" href="/docs/guides/curl/">cURL</a><a class="dx-link" href="/docs/guides/javascript/">JavaScript</a><a class="dx-link" href="/docs/guides/nodejs/">Node.js</a><a class="dx-link" href="/docs/guides/python/">Python</a><a class="dx-link" href="/docs/guides/php/">PHP</a><a class="dx-link on" href="/docs/guides/web/" aria-current="page">Aplikasi Web</a></div><div class="dx-group"><div class="dx-group-title">Referensi</div><a class="dx-link" href="/docs/reference/response-format/">Format Response</a><a class="dx-link" href="/docs/reference/status-codes/">Status Code</a><a class="dx-link" href="/docs/reference/security/">Keamanan dan Batasan</a><a class="dx-link" href="/docs/reference/not-available/">Belum Tersedia</a><a class="dx-link" href="/docs/reference/faq/">FAQ</a></div></nav>
+  </aside>
+  <div class="dx-overlay" id="overlay" hidden></div>
+  <main class="dx-main">
+    <article class="doc-content">
+      <div class="badge">PANDUAN</div>
+      <h1>Aplikasi Web</h1>
+      <p class="lead">Cara memakai Tikobox lewat website</p>
+      <details class="toc-inline"><summary>Di halaman ini</summary><ul><li><a href="#cara">Cara Pakai</a></li><li><a href="#galeri">Simpan ke Galeri</a></li><li><a href="#catatan">Catatan</a></li></ul></details>
+      <p>Tikobox dipakai untuk mengunduh video TikTok tanpa watermark. Tempel link, lalu video langsung tersimpan di perangkat kamu</p>
+<h2 id="cara">Cara Pakai<a class="anchor" href="#cara" aria-label="Tautan ke bagian ini">#</a></h2>
+<ol><li>Buka TikTok, pilih video, lalu tekan <b>Bagikan</b>, lalu <b>Salin tautan</b></li><li>Buka <a href="/docs/base-url/">Base URL</a>, tempel tautan pada kolom yang tersedia</li><li>Tekan <b>DOWNLOAD</b> dan tunggu proses link selesai</li><li>Setelah hasil muncul, tekan tombol download pada video untuk menyimpannya</li><li>Video langsung tersimpan ke galeri</li></ol>
+<p>Kamu juga bisa membuka <code>BASE_URL/?url=LINK</code> dan video langsung diproses</p>
+<h2 id="galeri">Simpan ke Galeri<a class="anchor" href="#galeri" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="platforms"><div><h3>Android</h3><p>File langsung diunduh dan otomatis muncul di aplikasi Galeri atau Google Foto</p></div><div><h3>iPhone</h3><p>Tekan <b>Simpan ke Galeri</b>, lalu pilih <b>Simpan Video</b> pada menu yang muncul</p></div><div><h3>Desktop</h3><p>File langsung diunduh ke folder Downloads di komputer kamu</p></div></div>
+<h2 id="catatan">Catatan<a class="anchor" href="#catatan" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="note note-info">Gunakan hanya untuk video milik kamu atau yang kamu punya izin mengunduhnya</div>
+<ul><li>Video harus berstatus publik</li><li>Jika gagal, periksa tautan lalu coba lagi beberapa saat kemudian</li><li>Postingan foto (slideshow) tersimpan sebagai gambar</li></ul>
+      <div class="pager">
+        <a class="pager-a" href="/docs/guides/php/"><small>Sebelumnya</small><b>PHP</b></a>
+        <a class="pager-a pager-next" href="/docs/reference/response-format/"><small>Berikutnya</small><b>Format Response</b></a>
+      </div>
+    </article>
+  </main>
+  <aside class="dx-toc" aria-label="Daftar isi">
+    <div class="dx-toc-in"><b>DI HALAMAN INI</b><ul><li><a href="#cara">Cara Pakai</a></li><li><a href="#galeri">Simpan ke Galeri</a></li><li><a href="#catatan">Catatan</a></li></ul></div>
+  </aside>
+</div>
+<footer>
+  <span>© 2026 Tikobox</span>
+  <span>Dokumentasi API</span>
+</footer>
+<script src="/assets/js/docs.js" defer></script>
+</body>
+</html>

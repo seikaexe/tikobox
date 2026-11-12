@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5ef">
+  <title>Penanganan Error - Tikobox Docs</title>
+  <meta name="description" content="Format error dan cara menanganinya">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://tikobox.vercel.app/docs/errors/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tikobox">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:title" content="Penanganan Error - Tikobox Docs">
+  <meta property="og:description" content="Format error dan cara menanganinya">
+  <meta property="og:url" content="https://tikobox.vercel.app/docs/errors/">
+  <meta property="og:image" content="https://tikobox.vercel.app/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="1200">
+  <meta property="og:image:alt" content="Logo Tikobox">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Penanganan Error - Tikobox Docs">
+  <meta name="twitter:description" content="Format error dan cara menanganinya">
+  <meta name="twitter:image" content="https://tikobox.vercel.app/og-image.png">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/docs.css">
+  <meta name="monetag" content="cf97f76e709b8bde5c0e811e064a9711">
+</head>
+<body class="dx-body">
+<nav class="nav">
+  <a class="brand" href="/"><span>TIKO</span>BOX</a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a class="active" href="/docs/">Docs</a>
+  </div>
+</nav>
+<div class="dx-bar">
+  <button id="menuBtn" class="btn btn-sm" type="button" aria-expanded="false" aria-controls="side">MENU</button>
+  <button id="searchBtn" class="btn btn-sm btn-blue" type="button">CARI</button>
+  <span class="dx-crumb">Mulai</span>
+</div>
+<div class="dx">
+  <aside class="dx-side" id="side" aria-label="Navigasi dokumentasi">
+    <div class="dx-search">
+      <label class="sr" for="q">Cari dokumentasi</label>
+      <input id="q" type="search" placeholder="Cari dokumentasi" autocomplete="off" spellcheck="false">
+      <kbd aria-hidden="true">/</kbd>
+    </div>
+    <div id="results" class="dx-results" hidden></div>
+    <nav id="navlist"><div class="dx-group"><div class="dx-group-title">Mulai</div><a class="dx-link" href="/docs/">Beranda</a><a class="dx-link" href="/docs/getting-started/">Memulai</a><a class="dx-link" href="/docs/base-url/">Base URL</a><a class="dx-link" href="/docs/authentication/">Autentikasi</a><a class="dx-link" href="/docs/rate-limits/">Rate Limit</a><a class="dx-link on" href="/docs/errors/" aria-current="page">Penanganan Error</a><a class="dx-link" href="/docs/changelog/">Changelog</a></div><div class="dx-group"><div class="dx-group-title">Downloader</div><a class="dx-link" href="/docs/downloader/video/">Video Downloader</a><a class="dx-link" href="/docs/downloader/audio/">Audio Downloader</a><a class="dx-link" href="/docs/downloader/slideshow/">Slideshow Downloader</a><a class="dx-link" href="/docs/downloader/media-proxy/">Media Proxy</a></div><div class="dx-group"><div class="dx-group-title">TikTok</div><a class="dx-link" href="/docs/tiktok/profile/">Profil TikTok</a><a class="dx-link" href="/docs/tiktok/hashtag/">Hashtag TikTok</a></div><div class="dx-group"><div class="dx-group-title">Utility</div><a class="dx-link" href="/docs/utility/health/">Health Check</a><a class="dx-link" href="/docs/utility/info/">API Info</a></div><div class="dx-group"><div class="dx-group-title">Panduan</div><a class="dx-link" href="/docs/guides/curl/">cURL</a><a class="dx-link" href="/docs/guides/javascript/">JavaScript</a><a class="dx-link" href="/docs/guides/nodejs/">Node.js</a><a class="dx-link" href="/docs/guides/python/">Python</a><a class="dx-link" href="/docs/guides/php/">PHP</a><a class="dx-link" href="/docs/guides/web/">Aplikasi Web</a></div><div class="dx-group"><div class="dx-group-title">Referensi</div><a class="dx-link" href="/docs/reference/response-format/">Format Response</a><a class="dx-link" href="/docs/reference/status-codes/">Status Code</a><a class="dx-link" href="/docs/reference/security/">Keamanan dan Batasan</a><a class="dx-link" href="/docs/reference/not-available/">Belum Tersedia</a><a class="dx-link" href="/docs/reference/faq/">FAQ</a></div></nav>
+  </aside>
+  <div class="dx-overlay" id="overlay" hidden></div>
+  <main class="dx-main">
+    <article class="doc-content">
+      <div class="badge">MULAI</div>
+      <h1>Penanganan Error</h1>
+      <p class="lead">Format error dan cara menanganinya</p>
+      <details class="toc-inline"><summary>Di halaman ini</summary><ul><li><a href="#urutan">Urutan Pengecekan</a></li><li><a href="#jenis">Jenis Error</a></li><li><a href="#pesan-502">Pesan pada Status 502</a></li><li><a href="#saran">Saran Penanganan</a></li></ul></details>
+      <p>Semua error memakai format yang sama dan status HTTP yang sesuai</p>
+<div class="code"><div class="code-head"><span class="code-lang">Format error</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="json">{
+  &quot;code&quot;: -1,
+  &quot;msg&quot;: &quot;pesan error&quot;
+}</code></pre></div>
+<ul><li><code>code</code> selalu <code>-1</code> untuk error</li><li><code>msg</code> berisi pesan yang aman ditampilkan. Detail teknis internal tidak dikirim ke klien</li></ul>
+<h2 id="urutan">Urutan Pengecekan<a class="anchor" href="#urutan" aria-label="Tautan ke bagian ini">#</a></h2>
+<ol><li>Cek status HTTP</li><li>Parse body sebagai JSON. Bila gagal di-parse, anggap error jaringan atau proxy</li><li>Cek <code>code !== 0</code>, lalu baca <code>msg</code></li></ol>
+<h2 id="jenis">Jenis Error<a class="anchor" href="#jenis" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="tbl "><table><thead><tr><th>Status</th><th>msg</th><th>Penyebab</th></tr></thead><tbody><tr><td><code>400</code></td><td><code>Link TikTok tidak valid. Tempel link setelah /api/, contoh: /api/https://vt.tiktok.com/xxxx</code></td><td>Link kosong atau bukan host TikTok yang didukung</td></tr><tr><td><code>400</code></td><td><code>URL media tidak diizinkan.</code></td><td>URL pada /api/download bukan host media TikTok</td></tr><tr><td><code>403</code></td><td><code>Akses ditolak.</code></td><td>Scanner keamanan, atau /api/download dipanggil dari halaman situs lain di browser</td></tr><tr><td><code>404</code></td><td><code>Username tidak valid</code></td><td>Input profil atau hashtag kosong, salah format, atau data tidak ditemukan</td></tr><tr><td><code>502</code></td><td>-</td><td>TikTok gagal diakses atau data tidak tersedia. Isi msg bervariasi, lihat tabel di bawah</td></tr><tr><td><code>504</code></td><td><code>Permintaan terlalu lama, coba lagi.</code></td><td>Proses melebihi 28 detik</td></tr><tr><td><code>429</code></td><td><code>Terlalu banyak permintaan. Coba lagi sebentar lagi.</code></td><td>Melewati batas request, lihat <a href="/docs/rate-limits/">Rate Limit</a></td></tr><tr><td><code>405</code></td><td><code>Metode tidak diizinkan.</code></td><td>Metode selain GET, HEAD, atau OPTIONS</td></tr><tr><td><code>414</code></td><td><code>URL terlalu panjang.</code></td><td>Panjang URL request lebih dari 2500 karakter</td></tr></tbody></table></div>
+<h2 id="pesan-502">Pesan pada Status 502<a class="anchor" href="#pesan-502" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="tbl "><table><thead><tr><th>msg</th><th>Arti</th></tr></thead><tbody><tr><td><code>Video tidak tersedia (privat, dihapus, atau dibatasi wilayah)</code></td><td>Konten tidak bisa diakses dari server</td></tr><tr><td><code>TikTok meminta verifikasi (captcha) untuk server ini, coba lagi nanti</code></td><td>TikTok menantang server. Ulangi beberapa saat kemudian</td></tr><tr><td><code>Data video TikTok tidak ditemukan di halaman</code></td><td>Halaman terbuka tetapi data video tidak ada</td></tr><tr><td><code>Permintaan ke TikTok terlalu lama, coba lagi.</code></td><td>TikTok tidak merespons tepat waktu</td></tr><tr><td><code>Link tidak diizinkan.</code></td><td>Link atau redirect mengarah ke tujuan yang ditolak oleh validasi keamanan</td></tr><tr><td><code>Gagal memproses URL</code></td><td>Pesan umum untuk error lain</td></tr></tbody></table></div>
+<h2 id="saran">Saran Penanganan<a class="anchor" href="#saran" aria-label="Tautan ke bagian ini">#</a></h2>
+<ul><li>Status <code>429</code>: tunggu sesuai <code>retry-after</code>, lalu ulangi</li><li>Status <code>502</code> dan <code>504</code>: boleh diulang dengan jeda, tetapi batasi jumlah percobaan</li><li>Status <code>400</code> dan <code>404</code>: perbaiki input, mengulang request yang sama tidak akan berhasil</li></ul>
+      <div class="pager">
+        <a class="pager-a" href="/docs/rate-limits/"><small>Sebelumnya</small><b>Rate Limit</b></a>
+        <a class="pager-a pager-next" href="/docs/changelog/"><small>Berikutnya</small><b>Changelog</b></a>
+      </div>
+    </article>
+  </main>
+  <aside class="dx-toc" aria-label="Daftar isi">
+    <div class="dx-toc-in"><b>DI HALAMAN INI</b><ul><li><a href="#urutan">Urutan Pengecekan</a></li><li><a href="#jenis">Jenis Error</a></li><li><a href="#pesan-502">Pesan pada Status 502</a></li><li><a href="#saran">Saran Penanganan</a></li></ul></div>
+  </aside>
+</div>
+<footer>
+  <span>© 2026 Tikobox</span>
+  <span>Dokumentasi API</span>
+</footer>
+<script src="/assets/js/docs.js" defer></script>
+</body>
+</html>

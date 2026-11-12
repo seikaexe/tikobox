@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5ef">
+  <title>cURL - Tikobox Docs</title>
+  <meta name="description" content="Skrip bash lengkap: ambil info lalu simpan video, foto, dan audio">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://tikobox.vercel.app/docs/guides/curl/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tikobox">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:title" content="cURL - Tikobox Docs">
+  <meta property="og:description" content="Skrip bash lengkap: ambil info lalu simpan video, foto, dan audio">
+  <meta property="og:url" content="https://tikobox.vercel.app/docs/guides/curl/">
+  <meta property="og:image" content="https://tikobox.vercel.app/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="1200">
+  <meta property="og:image:alt" content="Logo Tikobox">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="cURL - Tikobox Docs">
+  <meta name="twitter:description" content="Skrip bash lengkap: ambil info lalu simpan video, foto, dan audio">
+  <meta name="twitter:image" content="https://tikobox.vercel.app/og-image.png">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/docs.css">
+  <meta name="monetag" content="cf97f76e709b8bde5c0e811e064a9711">
+</head>
+<body class="dx-body">
+<nav class="nav">
+  <a class="brand" href="/"><span>TIKO</span>BOX</a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a class="active" href="/docs/">Docs</a>
+  </div>
+</nav>
+<div class="dx-bar">
+  <button id="menuBtn" class="btn btn-sm" type="button" aria-expanded="false" aria-controls="side">MENU</button>
+  <button id="searchBtn" class="btn btn-sm btn-blue" type="button">CARI</button>
+  <span class="dx-crumb">Panduan</span>
+</div>
+<div class="dx">
+  <aside class="dx-side" id="side" aria-label="Navigasi dokumentasi">
+    <div class="dx-search">
+      <label class="sr" for="q">Cari dokumentasi</label>
+      <input id="q" type="search" placeholder="Cari dokumentasi" autocomplete="off" spellcheck="false">
+      <kbd aria-hidden="true">/</kbd>
+    </div>
+    <div id="results" class="dx-results" hidden></div>
+    <nav id="navlist"><div class="dx-group"><div class="dx-group-title">Mulai</div><a class="dx-link" href="/docs/">Beranda</a><a class="dx-link" href="/docs/getting-started/">Memulai</a><a class="dx-link" href="/docs/base-url/">Base URL</a><a class="dx-link" href="/docs/authentication/">Autentikasi</a><a class="dx-link" href="/docs/rate-limits/">Rate Limit</a><a class="dx-link" href="/docs/errors/">Penanganan Error</a><a class="dx-link" href="/docs/changelog/">Changelog</a></div><div class="dx-group"><div class="dx-group-title">Downloader</div><a class="dx-link" href="/docs/downloader/video/">Video Downloader</a><a class="dx-link" href="/docs/downloader/audio/">Audio Downloader</a><a class="dx-link" href="/docs/downloader/slideshow/">Slideshow Downloader</a><a class="dx-link" href="/docs/downloader/media-proxy/">Media Proxy</a></div><div class="dx-group"><div class="dx-group-title">TikTok</div><a class="dx-link" href="/docs/tiktok/profile/">Profil TikTok</a><a class="dx-link" href="/docs/tiktok/hashtag/">Hashtag TikTok</a></div><div class="dx-group"><div class="dx-group-title">Utility</div><a class="dx-link" href="/docs/utility/health/">Health Check</a><a class="dx-link" href="/docs/utility/info/">API Info</a></div><div class="dx-group"><div class="dx-group-title">Panduan</div><a class="dx-link on" href="/docs/guides/curl/" aria-current="page">cURL</a><a class="dx-link" href="/docs/guides/javascript/">JavaScript</a><a class="dx-link" href="/docs/guides/nodejs/">Node.js</a><a class="dx-link" href="/docs/guides/python/">Python</a><a class="dx-link" href="/docs/guides/php/">PHP</a><a class="dx-link" href="/docs/guides/web/">Aplikasi Web</a></div><div class="dx-group"><div class="dx-group-title">Referensi</div><a class="dx-link" href="/docs/reference/response-format/">Format Response</a><a class="dx-link" href="/docs/reference/status-codes/">Status Code</a><a class="dx-link" href="/docs/reference/security/">Keamanan dan Batasan</a><a class="dx-link" href="/docs/reference/not-available/">Belum Tersedia</a><a class="dx-link" href="/docs/reference/faq/">FAQ</a></div></nav>
+  </aside>
+  <div class="dx-overlay" id="overlay" hidden></div>
+  <main class="dx-main">
+    <article class="doc-content">
+      <div class="badge">PANDUAN</div>
+      <h1>cURL</h1>
+      <p class="lead">Skrip bash lengkap: ambil info lalu simpan video, foto, dan audio</p>
+      <details class="toc-inline"><summary>Di halaman ini</summary><ul><li><a href="#skrip">Skrip Lengkap</a></li><li><a href="#tips">Tips</a></li></ul></details>
+      <p>Skrip berikut mengambil info link, lalu menyimpan video atau semua foto, dan audio bila ada. Membutuhkan <code>curl</code> dan <code>jq</code></p>
+<h2 id="skrip">Skrip Lengkap<a class="anchor" href="#skrip" aria-label="Tautan ke bagian ini">#</a></h2>
+<div class="code"><div class="code-head"><span class="code-lang">tikobox.sh</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="bash">#!/usr/bin/env bash
+# Butuh: bash, curl, jq
+# Pakai: ./tikobox.sh &quot;https://vt.tiktok.com/ZSxxxxxxx/&quot;
+set -euo pipefail
+
+BASE=&quot;https://tikobox.my.id&quot;
+UA=&quot;MyTikoboxClient/1.0&quot;
+LINK=&quot;${1:?pakai: ./tikobox.sh LINK_TIKTOK}&quot;
+
+download() { # download URL_MEDIA NAMA_FILE COOKIE
+  curl -sSf -G -A &quot;$UA&quot; &quot;$BASE/api/download&quot; \
+    --data-urlencode &quot;url=$1&quot; \
+    --data-urlencode &quot;name=$2&quot; \
+    --data-urlencode &quot;c=$3&quot; \
+    -o &quot;$2&quot;
+  echo &quot;tersimpan: $2&quot;
+}
+
+RESULT=$(curl -sS -G -A &quot;$UA&quot; --max-time 35 &quot;$BASE/api/tiktok&quot; --data-urlencode &quot;url=$LINK&quot;)
+
+if [ &quot;$(jq -r '.code' &lt;&lt;&lt;&quot;$RESULT&quot;)&quot; != &quot;0&quot; ]; then
+  echo &quot;Gagal: $(jq -r '.msg' &lt;&lt;&lt;&quot;$RESULT&quot;)&quot; &gt;&amp;2
+  exit 1
+fi
+
+ID=$(jq -r '.data.id' &lt;&lt;&lt;&quot;$RESULT&quot;)
+COOKIE=$(jq -r '.data.cookie // empty' &lt;&lt;&lt;&quot;$RESULT&quot;)
+
+if jq -e '.data.images' &lt;&lt;&lt;&quot;$RESULT&quot; &gt;/dev/null; then
+  # postingan foto (slideshow)
+  n=1
+  while read -r IMG; do
+    download &quot;$IMG&quot; &quot;$ID-$n.jpg&quot; &quot;$COOKIE&quot;
+    n=$((n + 1))
+  done &lt; &lt;(jq -r '.data.images[]' &lt;&lt;&lt;&quot;$RESULT&quot;)
+else
+  download &quot;$(jq -r '.data.play' &lt;&lt;&lt;&quot;$RESULT&quot;)&quot; &quot;$ID.mp4&quot; &quot;$COOKIE&quot;
+fi
+
+MUSIC=$(jq -r '.data.music' &lt;&lt;&lt;&quot;$RESULT&quot;)
+if [ -n &quot;$MUSIC&quot; ]; then
+  download &quot;$MUSIC&quot; &quot;$ID.mp3&quot; &quot;$COOKIE&quot;
+fi</code></pre></div>
+<div class="code"><div class="code-head"><span class="code-lang">Menjalankan</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="bash">chmod +x tikobox.sh
+./tikobox.sh &quot;https://vt.tiktok.com/ZSxxxxxxx/&quot;</code></pre></div>
+<h2 id="tips">Tips<a class="anchor" href="#tips" aria-label="Tautan ke bagian ini">#</a></h2>
+<ul><li>Gunakan <code>-G</code> bersama <code>--data-urlencode</code> agar nilai query di-encode dengan benar</li><li>Gunakan <code>-f</code> saat mengunduh agar curl gagal pada status HTTP error dan tidak menyimpan JSON error sebagai file</li><li>Lihat sisa jatah dengan <code>curl -sSI</code> lalu baca header <code>ratelimit-remaining</code></li></ul>
+<div class="code"><div class="code-head"><span class="code-lang">Melihat header</span><button class="copy" type="button" aria-label="Salin kode">SALIN</button></div><pre><code data-lang="bash">curl -sS -D - -o /dev/null -A &quot;MyTikoboxClient/1.0&quot; &quot;https://tikobox.my.id/api/health&quot;</code></pre></div>
+      <div class="pager">
+        <a class="pager-a" href="/docs/utility/info/"><small>Sebelumnya</small><b>API Info</b></a>
+        <a class="pager-a pager-next" href="/docs/guides/javascript/"><small>Berikutnya</small><b>JavaScript</b></a>
+      </div>
+    </article>
+  </main>
+  <aside class="dx-toc" aria-label="Daftar isi">
+    <div class="dx-toc-in"><b>DI HALAMAN INI</b><ul><li><a href="#skrip">Skrip Lengkap</a></li><li><a href="#tips">Tips</a></li></ul></div>
+  </aside>
+</div>
+<footer>
+  <span>© 2026 Tikobox</span>
+  <span>Dokumentasi API</span>
+</footer>
+<script src="/assets/js/docs.js" defer></script>
+</body>
+</html>

@@ -5,7 +5,7 @@ TikTok Downloader (TypeScript + Express) dengan tema Neobrutalism. Tanpa layanan
 ## Halaman
 
 - `/` untuk downloader
-- `/docs` untuk panduan
+- `/docs` untuk dokumentasi API developer (halaman statis di `public/docs/`)
 
 ## Struktur
 
@@ -93,8 +93,16 @@ Cara kerjanya:
 
 - `src/server.ts` mengekspor app Express sebagai default export, dan Vercel menjalankannya sebagai satu function
 - `public/` dilayani CDN Vercel, jadi `/` dan semua file di `/assets` tidak melewati function
-- `vercel.json` hanya berisi rewrite `/docs` ke `/docs.html`
+- `vercel.json` hanya berisi rewrite `/docs` ke `/docs/index.html`
 - Jalur `/api/*` ditangani Express (`/api/tiktok`, `/api/download`, `/api/health`)
 - `express.static` hanya berlaku saat dijalankan lokal, di Vercel diabaikan
 
 Untuk cek tipe sebelum deploy, jalankan `npm run typecheck`.
+
+## Dokumentasi /docs
+
+Konten ada di `scripts/docs/content.mjs`, hasil HTML statis di `public/docs/` (di-commit, tanpa build command saat deploy).
+
+- `npm run docs:build` generate ulang halaman, cek link internal dan aturan tanpa titik di akhir kalimat
+- `npm run docs:test` jalankan semua contoh kode terhadap server tiruan lokal (butuh node, bash, curl, jq, python3 + requests, php)
+- Ubah `scripts/docs/snippets/*` atau `examples.mjs` untuk contoh kode, jangan edit HTML hasil generate
